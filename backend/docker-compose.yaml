@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: backend-unipath
+    build: .
+    ports:
+      - "8080:3000"
+    environment:
+      - SERVER_PORT=8080
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=unipath
+    depends_on:
+      mysql:
+        condition: service_healthy
+      load_data:
+        condition: service_completed_successfully
+
+    volumes:
+      - /app/node_modules
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-unipath
+    command: --local-infile=1
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=unipath
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf  
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  load_data:
+    image: node:20-alpine
+    container_name: load-data
+    working_dir: /app
+    command: node database/loadData.js
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=unipath
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+
+volumes:
+  mysql_data:
