@@ -1,0 +1,17 @@
+@media (max-width: 768px) {
+    .ant-typography {
+      font-size: 16px !important;
+    }
+  }
+
+/* Default, no margin */
+.col-mobile-margin {
+    margin-bottom: 0;
+  }
+  
+  /* For mobile devices (when screen width is less than 576px) */
+  @media (max-width: 575px) {
+    .col-mobile-margin {
+      margin-bottom: 16px; /* Adjust margin as needed */
+    }
+  }
