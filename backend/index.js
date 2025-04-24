@@ -24,6 +24,16 @@ app.get('/', (req,res) => {
 
 
 //  Backend Port
-app.listen(port, () => {
-    console.log(`Server running on port http://localhost:${port}`);
-})
+(async () => {
+    try {
+        const loadData = require('./database/loadData');
+        await loadData();
+
+        app.listen(port, () => {
+            console.log(`✅ Server running on http://localhost:${port}`);
+        });
+    } catch (err) {
+        console.error("Failed to start server:", err);
+        process.exit(1);
+    }
+})();

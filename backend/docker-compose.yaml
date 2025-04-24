@@ -15,8 +15,6 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      load_data:
-        condition: service_completed_successfully
 
     volumes:
       - /app/node_modules
@@ -39,21 +37,6 @@ services:
       timeout: 5s
       retries: 10
 
-  load_data:
-    image: node:20-alpine
-    container_name: load-data
-    working_dir: /app
-    command: node database/loadData.js
-    volumes:
-      - .:/app
-    environment:
-      - DB_HOST=mysql
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - DB_NAME=unipath
-    depends_on:
-      mysql:
-        condition: service_healthy
 
 
 volumes:
