@@ -35,6 +35,9 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
+#Ignore all csv files in backend/csv-file
+backend/csv-file/*.csv
+
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
