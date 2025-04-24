@@ -100,7 +100,15 @@ async function importAllCSVs() {
 async function loadData() {
   await waitForMySQL();
   await initDatabase();
-  await importAllCSVs();
+  const [rows] = await pool.query("SELECT COUNT(*) AS count FROM majors");
+  const count = rows[0].count;
+
+  if (count === 0) {
+    console.log("Table is empty. Importing CSVs...");
+    await importAllCSVs();
+  } else {
+    console.log(`Table already has ${count} rows. Skipping import.`);
+  }
 }
 
 module.exports = loadData;
