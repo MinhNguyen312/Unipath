@@ -18,6 +18,7 @@ services:
 
     volumes:
       - /app/node_modules
+      - ./csv-file:/app/csv-file
 
   mysql:
     image: mysql:8.0
