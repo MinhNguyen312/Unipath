@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ConfigProvider,theme } from 'antd'
+import { ConfigProvider } from 'antd'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import {App as AntdApp} from 'antd'
 import './App.css'
