@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Affix, Menu, Typography, Tooltip} from 'antd';
+import { Layout, Affix, Menu, Typography} from 'antd';
 import { HomeOutlined, BarChartOutlined, SearchOutlined } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
