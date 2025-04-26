@@ -6,6 +6,7 @@ import {App as AntdApp} from 'antd'
 import './App.css'
 import Navbar from './components/Navbar'
 import Landing from './pages/Landing'
+import Analysis from './pages/Analysis'
 import AppFooter from './components/AppFooter'
 
 const queryClient = new QueryClient({
@@ -44,6 +45,7 @@ function App() {
               <main>
                 <Routes>
                   <Route path="/" element={<Landing />} />
+                  <Route path="/analysis" element={<Analysis />} />
                   {/* <Route path="/about" element={<AboutPage />} />
                   <Route path="/dashboard" element={<Dashboard />} /> */}
                   

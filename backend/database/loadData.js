@@ -34,6 +34,7 @@ async function initDatabase() {
       ten_nganh VARCHAR(255),
       diem FLOAT,
       to_hop_mon VARCHAR(255),
+      hoc_phi VARCHAR(255),
       ghi_chu TEXT,
       nam TEXT
     )
@@ -64,7 +65,7 @@ async function importCSV(filePath) {
       ENCLOSED BY '"' 
       LINES TERMINATED BY '\\n'
       IGNORE 1 LINES
-      (ma_truong, ten_truong, dia_diem, ma_nganh, ten_nganh, diem, to_hop_mon, ghi_chu)
+      (ma_truong, ten_truong, dia_diem, ma_nganh, ten_nganh, diem, to_hop_mon, hoc_phi, ghi_chu)
       SET nam = ?
   `;
 
