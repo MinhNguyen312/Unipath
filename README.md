@@ -35,7 +35,6 @@ This will start:
 
 mysql: MySQL database container (port 3307)
 
-load_data: a one-time script to import all CSV files in backend/csv-file/ into the majors table
 
 backend-unipath: backend server on port 8080
 ## CSV Directory Structure
