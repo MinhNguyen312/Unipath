@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { TodoList } from './components/TodoList'
+import SchoolComparison from './components/SchoolCompare'
 import './App.css'
 
 const queryClient = new QueryClient({
@@ -17,9 +18,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="app-container">
         <header className="app-header">
-          <h1>Todo App</h1>
         </header>
-        <TodoList />
+        <SchoolComparison />
       </div>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

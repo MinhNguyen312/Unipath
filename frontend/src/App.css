@@ -1,6 +1,5 @@
 body {
   margin: 0;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
@@ -14,17 +13,6 @@ body {
 .app-header {
   text-align: center;
   margin-bottom: 3rem;
-}
-
-.app-header h1 {
-  font-size: 2.5rem;
-  color: #1a1a1a;
-  margin: 0;
-  font-weight: 700;
-  background: linear-gradient(45deg, #1890ff, #722ed1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
