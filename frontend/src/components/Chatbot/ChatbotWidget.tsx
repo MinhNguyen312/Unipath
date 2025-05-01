@@ -67,7 +67,7 @@ const MessageBubble = ({ content, isUser }: Message) => (
 );
 
 const ChatHeader = () => <div style={styles.header}>Chatbot</div>;
-// ...import giữ nguyên
+
 
 const ChatContainer = ({
   messages,
@@ -99,6 +99,7 @@ export default function ChatbotWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [liveMessage, setLiveMessage] = useState<Message | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const hasAppended = useRef(false);
 
   const streamChat = useChatbot(
     (chunk: string) => {
@@ -109,13 +110,9 @@ export default function ChatbotWidget() {
     },
     () => {
       setLiveMessage((msg) => {
-        if (msg) {
-          setMessages((prev) => {
-            if (prev[prev.length -1].content != msg.content) {
-              return [...prev, msg]
-            }
-            return [...prev]
-          });
+        if (msg && !hasAppended.current) {
+          setMessages((prev) => [...prev, msg]);
+          hasAppended.current = true;
         }
         return null;
       });
@@ -133,6 +130,7 @@ export default function ChatbotWidget() {
     if (!message.trim()) return;
     const userMsg = { content: message, isUser: true };
     setMessages((prev) => [...prev, userMsg]);
+    hasAppended.current = false;
     streamChat(message);
     setMessage("");
   };
