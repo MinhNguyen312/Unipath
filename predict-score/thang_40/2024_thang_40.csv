@@ -1,0 +1,147 @@
+ma_truong,ten_truong,dia_diem,ma_nganh,ten_nganh,to_hop_mon,predicted_diem,newmajor,nam
+KHA,Đại học Kinh tế quốc dân,Hà Nội,7480201,Công nghệ thông tin,"A00, A01, D01, D07",33.18,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,EP10,Đầu tư tài chính (BFI - tiếng Anh hệ số 2),"A01, D01, D07, D10",35.5,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,7340405,Hệ thống thông tin,"A00, A01, D01, D07",33.68,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,7480101,Khoa học máy tính,"A00, A01, D01, D07",33.8,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,EP01,Khởi nghiệp và phát triển kinh doanh (BBAE) học bằng tiếng Anh (tiếng Anh hệ số 2),"A01, D01, D07, D09",34.99,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,EP14,Logistics và Quản lý chuỗi cung ứng tích hợp chứng chỉ quốc tế (LSIC),"A01, D01, D07, D10",35.54,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,POHE4,Luật kinh doanh,"A01, D01, D07, D09",35.7,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,7220201,Ngôn ngữ Anh,"A01, D01, D09, D10",35.41,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,POHE5,Quản trị kinh doanh thương mại,"A01, D01, D07, D09",35.7,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,POHE2,Quản trị lữ hành,"A01, D01, D07, D09",36.17,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,EP11,Quản trị khách sạn quốc tế (IHME - tiếng Anh hệ số 2),"A01, D01, D09, D10",34.0,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,POHE6,Quản lí thị trường,"A01, D01, D07, D09",35.77,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,POHE1,Quản trị khách sạn,"A01, D01, D07, D09",36.06,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,POHE7,Thẩm định giá,"A01, D01, D07, D09",35.61,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,7310107,Thống kê kinh tế,"A00, A01, D01, D07",34.46,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,7310108,Toán kinh tế,"A00, A01, D01, D07",34.38,0,2024
+KHA,Đại học Kinh tế quốc dân,Hà Nội,POHE3,Truyền thông Marketing,"A01, D01, D07, D09",35.7,0,2024
+HTC,Học viện Tài chính,Hà Nội,7340201C06,Hải quan & Logistics,"A01, D01, D07",34.58,0,2024
+HTC,Học viện Tài chính,Hà Nội,7220201,Ngôn ngữ Anh,"A01, D01, D07",34.89,0,2024
+HTC,Học viện Tài chính,Hà Nội,7340201C09,Phân tích tài chính,"A01, D01, D07",34.33,0,2024
+HTC,Học viện Tài chính,Hà Nội,7340201C11,Tài chính doanh nghiệp,"A01, D01, D07",34.56,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7220203,Ngôn ngữ Pháp,"D01, D03, D78, D90",34.84,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7220205,Ngôn ngữ Đức,"D01, D05, D78, D90",34.43,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7220210,Ngôn ngữ Hàn Quốc,"D01, D78, D90",34.76,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7220204,Ngôn ngữ Trung Quốc,"D01, D04, D78, D90",35.21,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7220202,Ngôn ngữ Nga,"D01, D02, D78, D90",33.63,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7220209,Ngôn ngữ Nhật,"D01, D06, D78, D90",34.9,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7220201,Ngôn ngữ Anh,"D01, D14, D78, D90",35.3,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7220211,Ngôn ngữ Ả Rập,"D01, D14, D78, D90",34.15,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7140231,Sư phạm Tiếng Anh,"D01, D14, D78, D90",36.56,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7140237,Sư phạm tiếng Hàn Quốc,"D01, D78, D90",35.71,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7140236,Sư phạm tiếng Nhật,"D01, D06, D78, D90",35.84,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7140234,Sư phạm Tiếng Trung Quốc,"D01, D04, D78, D90",35.93,0,2024
+QHF,Đại học Ngoại ngữ - Đại học Quốc Gia Hà Nội,Hà Nội,7220212QTD,Văn hóa và truyền thông xuyên quốc gia,"D01, D14, D78, D90",34.56,0,2024
+QHT,Đại học Khoa học tự nhiên - Đại học Quốc Gia Hà Nội,Hà Nội,QHT93,Khoa học dữ liệu,"A00, A01, D07, D08",34.44,0,2024
+QHT,Đại học Khoa học tự nhiên - Đại học Quốc Gia Hà Nội,Hà Nội,QHT98,Khoa học máy tính và thông tin*,"A00, A01, D07, D08",34.44,0,2024
+QHT,Đại học Khoa học tự nhiên - Đại học Quốc Gia Hà Nội,Hà Nội,QHT01,Toán học,"A00, A01, D07, D08",34.31,0,2024
+QHT,Đại học Khoa học tự nhiên - Đại học Quốc Gia Hà Nội,Hà Nội,QHT02,Toán tin,"A00, A01, D07, D08",34.06,0,2024
+NHH,Học viện Ngân hàng,Hà Nội,ACT01,CLC Kế toán,"A00, A01, D01, D07",33.65,0,2024
+NHH,Học viện Ngân hàng,Hà Nội,BUS01,CLC Quản trị kinh doanh,"A00, A01, D01, D07",33.95,0,2024
+NHH,Học viện Ngân hàng,Hà Nội,FIN01,CLC Tài chính,"A00, A01, D01, D07",33.64,0,2024
+NHH,Học viện Ngân hàng,Hà Nội,BANK01,CLC Ngân hàng,"A00, A01, D01, D07",33.65,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7340301,Kế toán,D01,33.29,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7340115,Marketing,D01,34.05,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7310111,Nghiên cứu phát triển,D01,33.6,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220205,Ngôn ngữ Đức,"D01, D05",34.04,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220207,Ngôn ngữ Bồ Đào Nha,D01,33.21,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220209,Ngôn ngữ Nhật,"D01, D06",34.57,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220202,Ngôn ngữ Nga,"D01, D02",33.0,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220208,Ngôn ngữ Italia,D01,33.68,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220201,Ngôn ngữ Anh,D01,34.69,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220206,Ngôn ngữ Tây Ban Nha,D01,34.07,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220204,Ngôn ngữ Trung Quốc,"D01, D04",34.42,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220210,Ngôn ngữ Hàn Quốc,D01,34.43,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7220203,Ngôn ngữ Pháp,"D01, D03",34.2,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7810103,Quản trị dịch vụ du lịch và lữ hành,D01,33.53,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7340101,Quản trị Kinh doanh,D01,34.56,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7310601,Quốc tế học,D01,34.07,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7340201,Tài chính – Ngân hàng,D01,33.48,0,2024
+NHF,Đại học Hà Nội,Hà Nội,7320109,Truyền thông doanh nghiệp,"D01, D03",34.05,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,K7480101L,"Công nghệ thông tin (song bằng, 2+2) - Chương trình liên kết Đại học La Trobe (Úc)","A01, D01",32.22,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7460112,ĐH Toán ứng dụng,"A00, A01",33.28,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7720201,Dược học,"A00, B00, D07",32.56,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7340301,Kế toán,"A00, A01, C01, D07",32.81,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7480101,Khoa học máy tính,"A00, A01, D01",33.78,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,F7480101,Khoa học máy tính - Chất lượng cao giảng dạy bằng tiếng Anh - Việt,"A00, A01, D01",33.06,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,FA7480101,Khoa học máy tính - Chất lượng cao giảng dạy 100% tiếng Anh,"A01, D01",32.31,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,FA7340120,Kinh doanh quốc tế - học bằng tiếng Anh,"A01, D01",33.74,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,F7340120,Kinh doanh quốc tế - Chất lượng cao giảng dạy bằng tiếng Anh - Việt,"A00, A01, D01",32.43,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,K7340120L,Kinh doanh quốc tế (song bằng 3 +1) – Chương trình liên kết Đại học La Trobe (Úc).,"A01, D01",32.35,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7480103,Kỹ thuật phần mềm,"A00, A01, D01",33.09,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,F7480103,Kỹ thuật phần mềm - Chất lượng cao giảng dạy bằng tiếng Anh - Việt,"A00, A01, D01",32.22,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,FA7480103,Kỹ thuật phần mềm - Chất lượng cao giảng dạy 100% tiếng Anh,"A01, D01",32.31,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7480102,Mạng máy tính và truyền thông dữ liệu,"A00, A01, D01",33.04,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7340115,Marketing,"A00, A01, D01",34.09,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,F7340115,Marketing -Chất lượng cao giảng dạy bằng tiếng Anh - Việt,"A00, A01, D01",32.48,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,FA7340115,Marketing - Chất lượng cao giảng dạy 100% tiếng Anh,"A01, D01",32.31,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7520216,Ngành Kỹ thuật điều khiển & Tự động hóa,"A00, A01, C01",31.67,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7380101,Ngành Luật,"A00, A01, C01, D01",32.36,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7340120,Ngành Kinh doanh quốc tế,"A00, A01, D01",34.09,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7220204,Ngôn ngữ Trung Quốc,"D01, D04, D11, D55",34.0,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7220201,Ngôn ngữ Anh,"D01, D11",34.45,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,F7220201,Ngôn ngữ Anh -Chất lượng cao giảng dạy bằng tiếng Anh - Việt,"D01, D11",33.22,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7340101,Quản trị Kinh doanh,"A00, A01, D01",34.53,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7340101N,Quản trị kinh doanh (Chuyên ngành Quản trị Nhà hàng - Khách sạn),"A00, A01, D01",33.94,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,F7340101,Quản trị kinh doanh (Chuyên ngành: Quản trị nguồn nhân lực) - Chất lượng cao giảng dạy bằng tiếng Anh - Việt,"A00, A01, D01",32.43,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7810301,Quản lý thể dục thể thao,"A01, D01, T00, T01",32.67,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,F7340201,Tài chính - Ngân hàng - Chất lượng cao giảng dạy bằng tiếng Anh - Việt,"A00, A01, D01, D07",32.79,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7340201,Tài chính – Ngân hàng,"A00, A01, D01, D07",33.71,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7210403,Thiết kế đồ họa,"H00, H01, H02, H03",32.74,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7310630Q,Việt Nam học (Chuyên ngành Du lịch và Quản lý du lịch),"A01, C00, C01, D01",32.78,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7310630,Việt Nam học,"A01, C00, C01, D01",33.0,0,2024
+DTT,Đại học Tôn Đức Thắng,TP HCM,7310301,Xã hội học,"A01, C00, C01, D01",33.0,0,2024
+MHN,Đại học Mở Hà Nội,Hà Nội,7220201,Ngôn ngữ Anh,D01,34.69,0,2024
+MHN,Đại học Mở Hà Nội,Hà Nội,7220204,Ngôn ngữ Trung Quốc,"D01, D04",34.42,0,2024
+MHN,Đại học Mở Hà Nội,Hà Nội,7810103,Quản trị dịch vụ du lịch và lữ hành,D01,33.53,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,604,Báo phát thanh,D01,34.57,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,604,Báo phát thanh,D78,35.07,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,602,Báo in,D72,34.56,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,607,Báo mạng điện tử,D72,35.41,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,605,Báo truyền hình,D72,35.08,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,605,Báo truyền hình,D01,34.67,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,602,Báo in,D78,34.53,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,607,Báo mạng điện tử,D01,34.94,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,602,Báo in,D01,34.07,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,604,Báo phát thanh,D72,34.97,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,605,Báo truyền hình,D78,35.17,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,607,Báo mạng điện tử,D78,35.45,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,611,"Ngành Quan hệ quốc tế, chuyên ngành Quan hệ chính trị và truyền thông quốc tế",D72,35.57,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,615,"Ngành Quan hệ công chúng, chuyên ngành Quan hệ công chúng chuyên nghiệp","A01, D01",35.61,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,606,"Ngành Báo chí, chuyên ngành Quay phim truyền hình",D72,35.13,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,616,"Ngành Quan hệ công chúng, chuyên ngành Truyền thông marketing (chất lượng cao)","A01, D01",35.38,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,616,"Ngành Quan hệ công chúng, chuyên ngành Truyền thông marketing (chất lượng cao)",D78,35.95,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,614,"Ngành Quan hệ quốc tế, chuyên ngành Quan hệ quốc tế và truyền thông toàn cầu (chất lượng cao)","A01, D01",35.01,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,603,"Ngành Báo chí, chuyên ngành Ảnh báo chí",D01,34.79,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,615,"Ngành Quan hệ công chúng, chuyên ngành Quan hệ công chúng chuyên nghiệp",D78,35.64,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,610,"Ngành Quan hệ quốc tế, chuyên ngành Thông tin đối ngoại","A01, D01",35.48,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,616,"Ngành Quan hệ công chúng, chuyên ngành Truyền thông marketing (chất lượng cao)",D72,36.02,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,615,"Ngành Quan hệ công chúng, chuyên ngành Quan hệ công chúng chuyên nghiệp",D72,35.94,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,611,"Ngành Quan hệ quốc tế, chuyên ngành Quan hệ chính trị và truyền thông quốc tế",D78,35.57,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,614,"Ngành Quan hệ quốc tế, chuyên ngành Quan hệ quốc tế và truyền thông toàn cầu (chất lượng cao)",D78,35.53,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,603,"Ngành Báo chí, chuyên ngành Ảnh báo chí",D78,34.9,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,611,"Ngành Quan hệ quốc tế, chuyên ngành Quan hệ chính trị và truyền thông quốc tế","A01, D01",35.48,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,606,"Ngành Báo chí, chuyên ngành Quay phim truyền hình","D01, D78",35.51,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,603,"Ngành Báo chí, chuyên ngành Ảnh báo chí",D72,34.93,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,610,"Ngành Quan hệ quốc tế, chuyên ngành Thông tin đối ngoại",D78,35.57,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,614,"Ngành Quan hệ quốc tế, chuyên ngành Quan hệ quốc tế và truyền thông toàn cầu (chất lượng cao)",D72,35.47,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,610,"Ngành Quan hệ quốc tế, chuyên ngành Thông tin đối ngoại",D72,35.57,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,7220201,Ngôn ngữ Anh,D78,34.94,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,7220201,Ngôn ngữ Anh,D72,35.13,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,7220201,Ngôn ngữ Anh,"A01, D01",34.8,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,7320110,Quảng cáo,"A01, D01",34.67,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,7320110,Quảng cáo,D78,34.88,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,7320110,Quảng cáo,D72,35.09,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,7320107,Truyền thông quốc tế,D72,34.86,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,7320107,Truyền thông quốc tế,"A01, D01",34.44,0,2024
+HBT,Học viện Báo chí và Tuyên truyền,Hà Nội,7320107,Truyền thông quốc tế,D78,34.55,0,2024
+HQT,Học viện Ngoại giao,Hà Nội,HQT02,Ngôn ngữ Anh,"A01, D01, D07",34.05,0,2024
+LDA,Đại học Công đoàn,Hà Nội,7220201,Ngôn ngữ Anh,"D01, D14, D15",34.21,0,2024
+HHA,Đại học Hàng hải Việt Nam,Hải Phòng,7220201D125,"Ngôn ngữ Anh,","A01, D01, D10, D14",33.34,0,2024
+HHA,Đại học Hàng hải Việt Nam,Hải Phòng,7220201D124,Tiếng Anh thương mại,"A01, D01, D10, D14",33.97,0,2024
+THV,Đại học Hùng Vương,Phú Thọ,7140206,Giáo dục Thể chất,T00,33.08,0,2024
+THV,Đại học Hùng Vương,Phú Thọ,7140201,Giáo dục Mầm non,M00,32.82,0,2024
+VHH,Đại học Văn hóa Hà Nội,Hà Nội,7810101C,Du lịch - Hướng dẫn du lịch quốc tế,"C19, D01, D09, D14, D15",32.7,0,2024
+VHH,Đại học Văn hóa Hà Nội,Hà Nội,7220201,Ngôn ngữ Anh,"C19, D01, D09, D14, D15",34.55,0,2024
+HCP,Học viện Chính sách và Phát triển,Hà Nội,7220201,Ngôn ngữ Anh,"A01, D01, D07, D10",34.64,0,2024
