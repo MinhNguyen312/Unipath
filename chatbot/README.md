@@ -19,7 +19,7 @@ Build image and run container
 
 ```bash
 docker build -t chatbot-be .
-docker run -d -p 8000:8000 chatbot-be
+docker run -d -p 8000:8000 --env-file .env chatbot-be
 ```
 
 Or run with docker compose
