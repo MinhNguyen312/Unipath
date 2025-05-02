@@ -1,29 +1,30 @@
-//  env variable setup
-require('dotenv').config();
-
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
 app.use(express.json());
+app.use(cors({origin: "http://localhost:5173"}));
+const routes = require("./routes");
+app.use("/api", routes);
 
+app.get("/", (req, res) => {
+    res.send("hello from the backend");
+});
 
-const routes = require('./routes');
+const startServer = async () => {
+    try {
+        const loadData = require("./database/loadData");
+        await loadData();
 
+        app.listen(port, () => {
+            console.log(`Server running on http://localhost:${port}`);
+        });
+    } catch (err) {
+        console.error("Failed to start server:", err);
+        process.exit(1);
+    }
+};
 
-//  Routes for APIs
-app.use('/api', routes);
-
-
-
-//  Root
-app.get('/', (req,res) => {
-    res.send('hello from the backend');
-})
-
-
-
-//  Backend Port
-app.listen(port, () => {
-    console.log(`Server running on port http://localhost:${port}`);
-})
+startServer();
