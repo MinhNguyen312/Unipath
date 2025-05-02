@@ -5,13 +5,21 @@ export function useChatbot(
 ) {
   return async (text: string) => {
     try {
-      const res = await fetch("http://localhost:8000/stream", {
+      const res = await fetch(`${import.meta.env.VITE_CHATBOT_URL}/stream`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text }] }],
+          "system_instruction": {
+            "role": "system",
+            "parts": [
+              {
+                "text": "Bạn là chatbot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia."
+              }
+            ]
+          },
+          contents: [{ role: "user", parts: [{ text: text }] }],
         }),
       });
 
@@ -28,17 +36,20 @@ export function useChatbot(
         if (value) {
           buffer += decoder.decode(value, { stream: true });
 
-          const lines = buffer.split("\n");
-          buffer = lines.pop() || "";
+          const lines = buffer.split("\n\n"); // mỗi event kết thúc bằng 2 dòng xuống dòng
+          buffer = lines.pop() || ""; // giữ phần chưa hoàn chỉnh
 
           for (const line of lines) {
-            if (line.trim().startsWith("{")) {
+            const trimmedLine = line.trim();
+            if (trimmedLine.startsWith("data: ")) {
+              const data = trimmedLine.replace(/^data: /, "");
+
               try {
-                const json = JSON.parse(line.trim());
+                const json = JSON.parse(data);
                 const part = json.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (part) onMessage(part);
               } catch (e) {
-                console.warn("Invalid JSON chunk:", line);
+                console.warn("Invalid JSON chunk:", data);
               }
             }
           }

@@ -4,6 +4,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from models import GenerationRequest
+from dotenv import load_dotenv
+
+load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
@@ -29,18 +32,31 @@ async def health():
 @app.post("/generate")
 async def generate(request_body: GenerationRequest):
     async with httpx.AsyncClient() as client:
-        res = await client.post(GEN_URL, headers=headers, json=request_body.dict())
+        res = await client.post(GEN_URL, headers=headers, json=request_body.model_dump())
         return JSONResponse(content=res.json())
 
 @app.post("/stream")
 async def stream(request_body: GenerationRequest):
     async def event_stream():
         async with httpx.AsyncClient(timeout=None) as client:
-            async with client.stream("POST", STREAM_URL, headers=headers, json=request_body.dict()) as response:
+            async with client.stream("POST", STREAM_URL, headers=headers, json=request_body.model_dump()) as response:
+                if response.status_code != 200:
+                    error_msg = await response.aread()
+                    yield f"data: {error_msg.decode()}\n\n"
+                    return
+
                 async for line in response.aiter_lines():
                     if line.startswith("data: "):
                         data = line.removeprefix("data: ").strip()
                         if data != "[DONE]":
-                            yield data + "\n"
+                            yield f"data: {data}\n\n"
 
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )

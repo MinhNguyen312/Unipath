@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button, Input, ConfigProvider } from "antd";
 import { MessageOutlined, CloseOutlined } from "@ant-design/icons";
 import { useChatbot } from "../../hooks/useChatbot";
+import ReactMarkdown from "react-markdown";
 
 const { TextArea } = Input;
 
@@ -63,10 +64,12 @@ const styles = {
 };
 
 const MessageBubble = ({ content, isUser }: Message) => (
-  <div style={styles.message(isUser)}>{content}</div>
+  <div style={styles.message(isUser)}>
+    <ReactMarkdown>{content}</ReactMarkdown>
+  </div>
 );
 
-const ChatHeader = () => <div style={styles.header}>Chatbot</div>;
+const ChatHeader = () => <div style={styles.header}>Unibot</div>;
 
 
 const ChatContainer = ({
