@@ -9,6 +9,7 @@ import Landing from './pages/Landing'
 import Analysis from './pages/Analysis'
 import AppFooter from './components/AppFooter'
 import ChatbotWidget from './components/Chatbot/ChatbotWidget'
+import FindSchool from './pages/FindSchool';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,8 +48,8 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Landing />} />
                   <Route path="/analysis" element={<Analysis />} />
-                  {/* <Route path="/about" element={<AboutPage />} />
-                  <Route path="/dashboard" element={<Dashboard />} /> */}
+                  <Route path="/find_school" element={<FindSchool/>} />
+                  {/* <Route path="/dashboard" element={<Dashboard />} /> */}
                   
                 </Routes>
                 <ChatbotWidget />
