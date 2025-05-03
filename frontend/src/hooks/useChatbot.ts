@@ -20,7 +20,7 @@ export function useChatbot(
             role: "system",
             parts: [
               {
-                text: "Bạn là chatbot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia.",
+                text: "Bạn là Unibot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia.",
               },
             ],
           },

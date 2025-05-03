@@ -68,9 +68,15 @@ const MessageBubble = ({ content, isUser }: Message) => (
     ...styles.message(isUser), 
     wordWrap: 'break-word', 
     overflowWrap: 'break-word',
-    whiteSpace: 'pre-wrap' 
+    whiteSpace: 'pre-wrap',
   }}>
-    <ReactMarkdown>{content}</ReactMarkdown>
+    <ReactMarkdown
+        components={{
+          p: ({ children }) => <div style={{ margin: 0, padding: 0 }}>{children}</div>,
+        }}
+      >
+        {content.trim()}
+    </ReactMarkdown>
   </div>
 );
 
