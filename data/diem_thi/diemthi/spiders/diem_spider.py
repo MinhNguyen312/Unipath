@@ -13,10 +13,11 @@ class DiemSpider(scrapy.Spider):
 
     empty_count_window = 20  # Cửa sổ kiểm tra liên tục
 
-    def __init__(self, start_province=1, end_province=64, *args, **kwargs):
+    def __init__(self, start_province=1, end_province=64, year=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.start_province = int(start_province)
         self.end_province = int(end_province)
+        self.year = int(year) if year else 2021
 
     def start_requests(self):
         for province in range(self.start_province, self.end_province + 1):
@@ -46,6 +47,9 @@ class DiemSpider(scrapy.Spider):
             soup = BeautifulSoup(response.text, 'html.parser')
             result_div = soup.find('div', class_='resultSearch__right')
 
+            edu_info = soup.find('p', class_='edu-institution')
+            khu_vuc = edu_info.get_text(strip=True).replace("Sở GD&ĐT", "").strip() if edu_info else 'UNKNOWN'
+
             if result_div and result_div.find('table'):
                 scores_dict = {
                     'Toán': 'N/A', 'Văn': 'N/A', 'Sử': 'N/A',
@@ -65,6 +69,7 @@ class DiemSpider(scrapy.Spider):
 
                 yield {
                     'SBD': sbd,
+                    'khu_vuc': khu_vuc,
                     'Toan': scores_dict['Toán'],
                     'Van': scores_dict['Văn'],
                     'Su': scores_dict['Sử'],
@@ -75,6 +80,7 @@ class DiemSpider(scrapy.Spider):
                     'Hoa': scores_dict['Hóa'],
                     'Sinh': scores_dict['Sinh'],
                 }
+                
 
                 got_data = True
                 history.append(True)

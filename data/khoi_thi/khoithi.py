@@ -1,7 +1,5 @@
 import pandas as pd
-
-df = pd.read_csv('thpt2020_final.csv', dtype={'SBD': str})
-df = df.fillna(0)
+import os
 
 # Nhóm môn theo khối
 khtn_subjects = ['Li', 'Hoa', 'Sinh']
@@ -35,35 +33,52 @@ khoi_thi_khxh = {
     'D15': ['Van', 'Dia', 'NgoaiNgu']
 }
 
+# Hàm xác định nhóm khối thi
 def check_student_group(row):
-    has_khtn = any(row[subject] > 0 for subject in khtn_subjects)
-    has_khxh = any(row[subject] > 0 for subject in khxh_subjects)
+    has_khtn = any(row.get(subject, 0) > 0 for subject in khtn_subjects)
+    has_khxh = any(row.get(subject, 0) > 0 for subject in khxh_subjects)
     return 'KHTN' if has_khtn else 'KHXH' if has_khxh else 'UNKNOWN'
 
-# Thêm cột nhóm vào DataFrame
-df['group'] = df.apply(check_student_group, axis=1)
+# Chạy qua các năm
+for year in range(2020, 2025):
+    input_file = f'thpt{year}_final.csv'
+    output_file = f'khoithi_{year}.csv'
 
-# Khởi tạo điểm các khối là "N/A"
-all_khoi = list(khoi_thi_khtn.keys()) + list(khoi_thi_khxh.keys())
-for khoi in all_khoi:
-    df[khoi] = "N/A"
-
-# Tính điểm tổ hợp phù hợp
-for idx, row in df.iterrows():
-    if row['group'] == 'KHTN':
-        khoi_thi = khoi_thi_khtn
-    elif row['group'] == 'KHXH':
-        khoi_thi = khoi_thi_khxh
-    else:
+    if not os.path.exists(input_file):
+        print(f" Không tìm thấy file: {input_file}")
         continue
 
-    for khoi, mon in khoi_thi.items():
-        score = sum(row[m] for m in mon)
-        df.at[idx, khoi] = round(score, 1)
+    print(f"\n Đang xử lý dữ liệu năm {year}...")
 
-cols = ['SBD'] + all_khoi
-df_khoi = df[cols]
-df_khoi.loc[:, 'SBD'] = df_khoi['SBD'].apply(lambda x: str(x).zfill(8))
+    df = pd.read_csv(input_file, dtype={'SBD': str})
+    df = df.fillna(0)
 
-df_khoi.to_csv('khoithi_2020.csv', index=False)
-print(" Đã lưu file tổng hợp khối thi: khoithi_2020.csv với các tổ hợp không phù hợp ghi là 'N/A'")
+    df['group'] = df.apply(check_student_group, axis=1)
+
+    all_khoi = list(khoi_thi_khtn.keys()) + list(khoi_thi_khxh.keys())
+    for khoi in all_khoi:
+        df[khoi] = "N/A"
+
+    for idx, row in df.iterrows():
+        if row['group'] == 'KHTN':
+            khoi_thi = khoi_thi_khtn
+        elif row['group'] == 'KHXH':
+            khoi_thi = khoi_thi_khxh
+        else:
+            continue
+
+        for khoi, mon in khoi_thi.items():
+            try:
+                score = sum(float(row.get(m, 0)) for m in mon)
+                df.at[idx, khoi] = score
+            except:
+                continue  
+
+    cols = ['SBD', 'khu_vuc'] + all_khoi
+    df_khoi = df[cols]
+
+    df_khoi['SBD'] = df_khoi['SBD'].apply(lambda x: str(x).zfill(8))
+
+    # Xuất ra file CSV
+    df_khoi.to_csv(output_file, index=False)
+    print(f" Đã lưu: {output_file} ({len(df_khoi)} dòng)")
