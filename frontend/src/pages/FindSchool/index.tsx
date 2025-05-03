@@ -3,6 +3,7 @@ import React, {useState} from "react";
 import type { ColumnsType } from 'antd/es/table';
 import { universities } from "../../data/universities";
 import { evaluationCombinations } from "../../data/evaluationCombinations";
+import SchoolComparison from "../../components/SchoolCompare/SchoolCompare";
 
 const {Title} = Typography;
 const {Content} = Layout;
@@ -151,6 +152,10 @@ const FindSchool : React.FC = () => {
               </Col>
             </Row>
           </Card>
+          <Card style={{ maxWidth: '100%', marginLeft: '10%', marginRight: '10%', marginTop: '20px',marginBottom: '20px' }}>
+            <SchoolComparison/>
+          </Card>
+
         </Content>
       </Layout>      
     )

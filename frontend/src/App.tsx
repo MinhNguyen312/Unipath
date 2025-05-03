@@ -1,5 +1,4 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ConfigProvider } from 'antd'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import {App as AntdApp} from 'antd'
@@ -47,9 +46,8 @@ function App() {
               <main>
                 <Routes>
                   <Route path="/" element={<Landing />} />
-                  <Route path="/analysis" element={<Analysis />} />
+                  <Route path="/analytics" element={<Analysis />} />
                   <Route path="/find_school" element={<FindSchool/>} />
-                  {/* <Route path="/dashboard" element={<Dashboard />} /> */}
                   
                 </Routes>
                 <ChatbotWidget />
@@ -62,8 +60,6 @@ function App() {
           </Router>
         </AntdApp>
       </ConfigProvider>
-
-      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
 }

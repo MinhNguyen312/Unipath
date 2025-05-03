@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   BarChartOutlined, 
   BankOutlined, 
@@ -75,6 +76,8 @@ const steps = [
 ];
 
 const Landing: React.FC = () => {
+  const navigate = useNavigate();
+  
   return (
     <Layout>
       <Content>
@@ -103,12 +106,14 @@ const Landing: React.FC = () => {
                       size="large" 
                       icon={<SearchOutlined />}
                       className="primary-button"
+                      onClick={() => navigate('/find_school')}
                     >
                       Tìm Trường Phù Hợp
                     </Button>
                     <Button 
                       size="large" 
                       className="outline-button"
+                      onClick={() => navigate('/analytics')}
                     >
                       Phân tích điểm
                     </Button>
@@ -153,7 +158,7 @@ const Landing: React.FC = () => {
                       </Typography.Text>
                     </div>
                   </div>
-                  <Button type="primary" block className="primary-button">
+                  <Button type="primary" block className="primary-button" onClick={() => navigate('/find_school')}>
                     Bắt đầu ngay
                   </Button>
                 </Space>

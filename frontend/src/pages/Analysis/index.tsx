@@ -5,7 +5,7 @@ const { Content } = Layout;
 import TableauEmbed from '../../components/Tableau/TableauEmbed';
 
 
-const Finder: React.FC = () => {
+const Analysis: React.FC = () => {
   return (
     <Layout>
       <Content className="finder-content" style={{ backgroundColor: 'white' }}>
@@ -15,4 +15,4 @@ const Finder: React.FC = () => {
   );
 };
 
-export default Finder; 
+export default Analysis; 
