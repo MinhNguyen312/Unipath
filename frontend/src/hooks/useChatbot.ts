@@ -3,15 +3,20 @@ export function useChatbot(
   onDone: () => void,
   onError: () => void
 ) {
-  return async (text: string) => {
+  return async (messages: { content: string; isUser: boolean }[]) => {
     try {
+      const formattedMessages = messages.map((msg) => ({
+        role: msg.isUser ? "user" : "model",
+        parts: [{ text: msg.content }],
+      }));
+
       const res = await fetch(`${import.meta.env.VITE_CHATBOT_URL}/stream`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: text }] }],
+          contents: formattedMessages,
         }),
       });
 
@@ -28,8 +33,8 @@ export function useChatbot(
         if (value) {
           buffer += decoder.decode(value, { stream: true });
 
-          const lines = buffer.split("\n\n"); // mỗi event kết thúc bằng 2 dòng xuống dòng
-          buffer = lines.pop() || ""; // giữ phần chưa hoàn chỉnh
+          const lines = buffer.split("\n\n");
+          buffer = lines.pop() || "";
 
           for (const line of lines) {
             const trimmedLine = line.trim();

@@ -64,8 +64,19 @@ const styles = {
 };
 
 const MessageBubble = ({ content, isUser }: Message) => (
-  <div style={styles.message(isUser)}>
-    <ReactMarkdown>{content}</ReactMarkdown>
+  <div style={{ 
+    ...styles.message(isUser), 
+    wordWrap: 'break-word', 
+    overflowWrap: 'break-word',
+    whiteSpace: 'pre-wrap',
+  }}>
+    <ReactMarkdown
+        components={{
+          p: ({ children }) => <div style={{ margin: 0, padding: 0 }}>{children}</div>,
+        }}
+      >
+        {content.trim()}
+    </ReactMarkdown>
   </div>
 );
 
@@ -90,7 +101,7 @@ const ChatContainer = ({
       {messages.map((msg, idx) => (
         <MessageBubble key={idx} {...msg} />
       ))}
-      {liveMessage && <MessageBubble {...liveMessage} />}
+      {liveMessage?.content && <MessageBubble {...liveMessage} />}
       <div ref={bottomRef} />
     </div>
   );
@@ -105,9 +116,9 @@ export default function ChatbotWidget() {
   const hasAppended = useRef(false);
 
   const streamChat = useChatbot(
-    (chunk: string) => {
+    (text: string) => {
       setLiveMessage((prev) => ({
-        content: (prev?.content || "") + chunk,
+        content: (prev?.content || "") + text,
         isUser: false,
       }));
     },
@@ -123,7 +134,7 @@ export default function ChatbotWidget() {
     () => {
       setMessages((prev) => [
         ...prev,
-        { content: "Server...", isUser: false },
+        { content: "Server lỗi", isUser: false },
       ]);
       setLiveMessage(null);
     }
@@ -134,8 +145,9 @@ export default function ChatbotWidget() {
     const userMsg = { content: message, isUser: true };
     setMessages((prev) => [...prev, userMsg]);
     hasAppended.current = false;
-    streamChat(message);
+    streamChat([...messages, userMsg]);
     setMessage("");
+    setLiveMessage(null);
   };
 
   return (
