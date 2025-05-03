@@ -11,14 +11,6 @@ export function useChatbot(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          "system_instruction": {
-            "role": "system",
-            "parts": [
-              {
-                "text": "Bạn là chatbot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia."
-              }
-            ]
-          },
           contents: [{ role: "user", parts: [{ text: text }] }],
         }),
       });
