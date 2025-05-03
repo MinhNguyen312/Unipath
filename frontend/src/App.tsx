@@ -7,6 +7,7 @@ import './App.css'
 import Navbar from './components/Navbar'
 import Landing from './pages/Landing'
 import AppFooter from './components/AppFooter'
+import FindSchool from './pages/FindSchool';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,8 +45,8 @@ function App() {
               <main>
                 <Routes>
                   <Route path="/" element={<Landing />} />
-                  {/* <Route path="/about" element={<AboutPage />} />
-                  <Route path="/dashboard" element={<Dashboard />} /> */}
+                  <Route path="/find_school" element={<FindSchool/>} />
+                  {/* <Route path="/dashboard" element={<Dashboard />} /> */}
                   
                 </Routes>
               </main>
