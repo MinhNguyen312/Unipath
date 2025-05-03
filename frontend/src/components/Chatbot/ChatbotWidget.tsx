@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button, Input, ConfigProvider } from "antd";
-import { MessageOutlined, CloseOutlined } from "@ant-design/icons";
+import { MessageOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useChatbot } from "../../hooks/useChatbot";
 import ReactMarkdown from "react-markdown";
 
@@ -80,7 +80,29 @@ const MessageBubble = ({ content, isUser }: Message) => (
   </div>
 );
 
-const ChatHeader = () => <div style={styles.header}>Unibot</div>;
+const ChatHeader = ({ onReset }: { onReset: () => void }) => (
+  <div style={{ ...styles.header, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <span>Unibot</span>
+    <Button
+      type="text"
+      shape="circle"
+      icon={<ReloadOutlined />}
+      onClick={onReset}
+      title="Tạo đoạn chat mới"
+      style={{
+        color: 'white',
+        backgroundColor: '#1E894E',
+        transition: 'all 0.3s',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = '#15723F';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = '#1E894E';
+      }}
+    />
+  </div>
+);
 
 
 const ChatContainer = ({
@@ -150,6 +172,13 @@ export default function ChatbotWidget() {
     setLiveMessage(null);
   };
 
+  const handleReset = () => {
+    setMessages([]);
+    setLiveMessage(null);
+    setMessage("");
+    hasAppended.current = false;
+  };
+
   return (
     <ConfigProvider
       theme={{
@@ -173,7 +202,7 @@ export default function ChatbotWidget() {
 
       {open && (
         <div style={styles.popup}>
-          <ChatHeader />
+          <ChatHeader onReset={handleReset} />
           <ChatContainer
             messages={messages}
             liveMessage={liveMessage}
