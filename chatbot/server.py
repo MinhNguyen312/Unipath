@@ -3,7 +3,7 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from models import GenerationRequest
+from models import Content, GenerationRequest
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -31,12 +31,22 @@ async def health():
 
 @app.post("/generate")
 async def generate(request_body: GenerationRequest):
+    request_body.system_instruction = Content(
+        role="system",
+        parts=[{ "text": "Bạn là chatbot có tên Unibot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia. Không trả lời các câu hỏi không liên quan. Và trả lời một cách lịch sự." }]
+    )
+
     async with httpx.AsyncClient() as client:
         res = await client.post(GEN_URL, headers=headers, json=request_body.model_dump())
         return JSONResponse(content=res.json())
 
 @app.post("/stream")
 async def stream(request_body: GenerationRequest):
+    request_body.system_instruction = Content(
+        role="system",
+        parts=[{ "text": "Bạn là chatbot có tên Unibot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia. Không trả lời các câu hỏi không liên quan. Và trả lời một cách lịch sự." }]
+    )
+
     async def event_stream():
         async with httpx.AsyncClient(timeout=None) as client:
             async with client.stream("POST", STREAM_URL, headers=headers, json=request_body.model_dump()) as response:
