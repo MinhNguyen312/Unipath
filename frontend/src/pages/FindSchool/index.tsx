@@ -1,12 +1,13 @@
 import { Layout, Card, Typography, Form, InputNumber,Button, Table, Select, Row, Col, Radio, RadioChangeEvent } from "antd";
 import React, {useState} from "react";
 import type { ColumnsType } from 'antd/es/table';
-import { universities } from "../../data/universities";
 import { evaluationCombinations } from "../../data/evaluationCombinations";
+import axios from "axios";
 
 const {Title} = Typography;
 const {Content} = Layout;
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 
   interface University {
@@ -23,21 +24,22 @@ const {Content} = Layout;
     [subject: string]: string;
   }
 
+  
   const examCombination = [
-    {label: "KHTN", value: ["Toán", "Ngữ Văn", "Anh Văn", "Vật Lý"," Hóa Học", "Sinh Học"]},
+    {label: "KHTN", value: ["Toán", "Ngữ Văn", "Anh Văn", "Vật Lý","Hóa Học", "Sinh Học"]},
     {label: "KHXH", value: ["Toán", "Ngữ Văn", "Anh Văn", "Lịch Sử", "GDCD", "Địa Lí"]}
   ]
-  
-  
-  
 
 const FindSchool : React.FC = () => {
 
     
     const [selectedCombo, setSelectedCombo] = useState<string | null>("A00");
     const [subjects, setSubjects] = useState<string[]>([]);
-    const [results, setResults] = useState<Set<University>>(new Set<University>());
+    const [results, setResults] = useState<University[]>([]);
     const [findMode, setFindMode] = useState<string>("combination"); 
+
+
+
     const onComboChange = (value: string) => {
 
       if(findMode === "combination"){
@@ -50,38 +52,68 @@ const FindSchool : React.FC = () => {
         setSubjects(combo ? combo.value : []);
       }      
     };
-
-    const findMatches = (subjects: string[], values: FormValues): Set<University> => {
-      
-
-      const totalScore = subjects.reduce((sum, subject) => {
-        const subjectScore = parseFloat(values[subject]) || 0;
-        return sum + subjectScore;
-      }, 0);
   
-      const matches = new Set<University>(universities.filter(
-        (uni) =>
-          selectedCombo &&
-          uni.acceptedCombinations.includes(selectedCombo) &&
-          totalScore >= uni.requiredScore
-      ));
 
-      
-
-      return matches;
-    }
-  
-    const onFinish = (values: FormValues) => {  
-      let matches = new Set<University>();
-
+    const onFinish = async (values: FormValues) => {  
+        console.log(values);
       if(findMode === "combination"){
-        matches = findMatches(subjects,values);
-      } else {
-        // Implement find matches for overall scores
+        let scores: Record<string,string> = {}
+
+        subjects.forEach(item => {
+          scores[item] = values[item];
+        })
+
+        try {
+          const res = await axios.post(`${API_BASE_URL}/api/universities/match`,{
+            scores
+          })
+
+          setResults(res.data);
+        } catch(error) {
+          console.error("Failed to fetch matched universities:", error);
+        }
         
+      } else {
+        let scores = {};
+
+        switch(selectedCombo){
+          case "KHTN":
+            scores = {
+              "Toán": values["Toán"],
+              "Ngữ Văn": values["Ngữ Văn"],
+              "Anh Văn": values["Anh Văn"],
+              "Vật Lý": values["Vật Lý"],
+              "Hóa Học": values["Hóa Học"],
+              "Sinh Học": values["Sinh Học"],
+            };
+            break;
+          case "KHXH":
+            scores = {
+              "Toán": values["Toán"],
+              "Ngữ Văn": values["Ngữ Văn"],
+              "Anh Văn": values["Anh Văn"],
+              "Địa Lí": values["Địa Lí"],
+              "Lịch Sử": values["Lịch Sử"],
+              "GDCD": values["GDCD"],
+            }
+        }
+
+        console.log(scores);
+        
+
+        try {
+          const res = await axios.post(`${API_BASE_URL}/api/universities/match`, {
+            scores
+          },
+          
+        );
+    
+          setResults(res.data); // Assuming API returns an array of matches
+        } catch (error) {
+          console.error("Failed to fetch matched universities:", error);
+        }
       }
 
-      setResults(matches);
     };
 
     const onFindModeChange = (e: RadioChangeEvent) => {
@@ -210,7 +242,7 @@ const FindSchool : React.FC = () => {
               {/* Right Column: Results (Larger width) */}
               <Col xs={24} lg={16}>
                 <Card>
-                  {results.size > 0 ? (
+                  {results.length > 0 ? (
                     <>
                       <Title level={4} style={{color:'#1e894e'}}>Trường Đại Học Phù Hợp</Title>
                       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
