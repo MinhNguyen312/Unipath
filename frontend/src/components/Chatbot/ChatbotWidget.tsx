@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button, Input, ConfigProvider } from "antd";
-import { MessageOutlined, CloseOutlined, ReloadOutlined } from "@ant-design/icons";
+import { MessageOutlined, CloseOutlined, ReloadOutlined, DownOutlined } from "@ant-design/icons";
 import { useChatbot } from "../../hooks/useChatbot";
 import ReactMarkdown from "react-markdown";
 
@@ -109,21 +109,29 @@ const ChatContainer = ({
   messages,
   liveMessage,
   bottomRef,
+  setIsScrolledUp,
 }: {
   messages: Message[];
   liveMessage: Message | null;
   bottomRef: React.RefObject<HTMLDivElement | null>;
+  setIsScrolledUp: (value: boolean) => void;
 }) => {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, liveMessage]);
 
   return (
-    <div style={styles.chatContainer}>
+    <div style={styles.chatContainer}
+    onScroll={(e) => {
+      const el = e.currentTarget;
+      const isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 10;
+      setIsScrolledUp(!isAtBottom);
+    }}>
       {messages.map((msg, idx) => (
         <MessageBubble key={idx} {...msg} />
       ))}
-      {liveMessage?.content && <MessageBubble {...liveMessage} />}
+      {liveMessage?.content && <MessageBubble {...liveMessage} 
+      />}
       <div ref={bottomRef} />
     </div>
   );
@@ -136,6 +144,9 @@ export default function ChatbotWidget() {
   const [liveMessage, setLiveMessage] = useState<Message | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const hasAppended = useRef(false);
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
+  const [isComposing, setIsComposing] = useState(false);
+
 
   const streamChat = useChatbot(
     (text: string) => {
@@ -150,6 +161,7 @@ export default function ChatbotWidget() {
           setMessages((prev) => [...prev, msg]);
           hasAppended.current = true;
         }
+        setIsComposing(false);
         return null;
       });
     },
@@ -163,6 +175,7 @@ export default function ChatbotWidget() {
   );
 
   const handleSend = () => {
+    setIsComposing(true);
     if (!message.trim()) return;
     const userMsg = { content: message, isUser: true };
     setMessages((prev) => [...prev, userMsg]);
@@ -207,7 +220,26 @@ export default function ChatbotWidget() {
             messages={messages}
             liveMessage={liveMessage}
             bottomRef={bottomRef}
+            setIsScrolledUp={setIsScrolledUp}
           />
+          {isScrolledUp && !isComposing && !liveMessage && (
+              <Button
+                shape="circle"
+                icon={<DownOutlined />}
+                onClick={() => bottomRef.current?.scrollIntoView({ behavior: "smooth" })}
+                style={{
+                  position: "absolute",
+                  right: 30,
+                  bottom: 150,
+                  width: 32,
+                  height: 32,
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+                  backgroundColor: "#FFFFFF", // màu xám
+                  color: "#1E894E",
+                  zIndex: 20,
+                }}                
+              />
+          )}
           <div style={{ padding: "8px 12px", borderTop: "1px solid #eee" }}>
             <TextArea
               value={message}
