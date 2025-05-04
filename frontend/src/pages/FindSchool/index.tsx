@@ -1,5 +1,5 @@
 import { Layout, Card, Typography, Form, InputNumber,Button, Table, Select, Row, Col, Radio, RadioChangeEvent } from "antd";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import type { ColumnsType } from 'antd/es/table';
 import { universities } from "../../data/universities";
 import { evaluationCombinations } from "../../data/evaluationCombinations";
@@ -20,7 +20,7 @@ const {Content} = Layout;
   
   interface FormValues {
     combination: string;
-    [subject: string]: any;
+    [subject: string]: string;
   }
 
   const examCombination = [
@@ -148,7 +148,10 @@ const FindSchool : React.FC = () => {
                     </Form.Item>
 
                     <Form.Item
-                        label={findMode === "combination" ? "Chọn Tổ hợp xét tuyển" : "Chọn khối thi"}
+                        labelCol={{ span: 6 }}  
+                        wrapperCol={{ span: '100%' }}
+                        labelAlign="left"  
+                        label={findMode === "combination" ? "Tổ hợp xét tuyển" : "Khối thi"}
                         name="combination"
                         
                         rules={[{ required: true, message: 'Please select a combination' }]}
