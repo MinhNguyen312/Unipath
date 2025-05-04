@@ -1,5 +1,5 @@
-import { Layout, Card, Typography, Form, InputNumber,Button, Table, Select, Row, Col } from "antd";
-import React, {useState} from "react";
+import { Layout, Card, Typography, Form, InputNumber,Button, Table, Select, Row, Col, Radio, RadioChangeEvent } from "antd";
+import React, {useEffect, useState} from "react";
 import type { ColumnsType } from 'antd/es/table';
 import { universities } from "../../data/universities";
 import { evaluationCombinations } from "../../data/evaluationCombinations";
@@ -22,6 +22,11 @@ const {Content} = Layout;
     combination: string;
     [subject: string]: any;
   }
+
+  const examCombination = [
+    {label: "KHTN", value: ["Toán", "Ngữ Văn", "Anh Văn", "Vật Lý"," Hóa Học", "Sinh Học"]},
+    {label: "KHXH", value: ["Toán", "Ngữ Văn", "Anh Văn", "Lịch Sử", "GDCD", "Địa Lí"]}
+  ]
   
   
   
@@ -29,30 +34,61 @@ const {Content} = Layout;
 const FindSchool : React.FC = () => {
 
     
-    const [selectedCombo, setSelectedCombo] = useState<string | null>(null);
+    const [selectedCombo, setSelectedCombo] = useState<string | null>("A00");
     const [subjects, setSubjects] = useState<string[]>([]);
-    const [results, setResults] = useState<University[]>([]);
-  
+    const [results, setResults] = useState<Set<University>>(new Set<University>());
+    const [findMode, setFindMode] = useState<string>("combination"); 
     const onComboChange = (value: string) => {
-      const combo = evaluationCombinations.find((item) => item.label === value);
-      setSelectedCombo(value);
-      setSubjects(combo ? combo.value : []);
+
+      if(findMode === "combination"){
+        const combo = evaluationCombinations.find((item) => item.label === value);
+        setSelectedCombo(value);
+        setSubjects(combo ? combo.value : []);
+      } else {
+        const combo = examCombination.find((item) => item.label === value);
+        setSelectedCombo(value);
+        setSubjects(combo ? combo.value : []);
+      }      
     };
-  
-    const onFinish = (values: FormValues) => {
+
+    const findMatches = (subjects: string[], values: FormValues): Set<University> => {
+      
+
       const totalScore = subjects.reduce((sum, subject) => {
         const subjectScore = parseFloat(values[subject]) || 0;
         return sum + subjectScore;
       }, 0);
   
-      const matches = universities.filter(
+      const matches = new Set<University>(universities.filter(
         (uni) =>
           selectedCombo &&
           uni.acceptedCombinations.includes(selectedCombo) &&
           totalScore >= uni.requiredScore
-      );
+      ));
+
+      
+
+      return matches;
+    }
+  
+    const onFinish = (values: FormValues) => {  
+      let matches = new Set<University>();
+
+      if(findMode === "combination"){
+        matches = findMatches(subjects,values);
+      } else {
+        // Implement find matches for overall scores
+        
+      }
+
       setResults(matches);
     };
+
+    const onFindModeChange = (e: RadioChangeEvent) => {
+
+      setFindMode(e.target.value);
+    }
+
   
     const columns: ColumnsType<University> = [
       { title: 'Tên Trường', dataIndex: 'name', key: 'name' },
@@ -81,21 +117,61 @@ const FindSchool : React.FC = () => {
                     layout="horizontal"  // Compact form layout
                     onFinish={onFinish}
                   >
+
+
+                    <Form.Item 
+                      label="Tìm trường theo tổ hợp xét tuyển hoặc khối thi"
+                      labelCol={{span: 24}}
+
+                    >
+                      <>
+                        <Radio.Group
+                          value={findMode}
+                          onChange={onFindModeChange}
+                          optionType="button"
+                          size="large"
+                          options={
+                            [
+                              {
+                                value: "combination",
+                                label: "Tổ hợp"
+                              },
+                              {
+                                value: "overall",
+                                label: "Điểm Tốt nghiệp"
+                              }
+                            ]
+                          }
+                        />
+
+                      </>
+                    </Form.Item>
+
                     <Form.Item
-                        label="Chọn tổ hợp xét tuyển"
+                        label={findMode === "combination" ? "Chọn Tổ hợp xét tuyển" : "Chọn khối thi"}
                         name="combination"
                         
                         rules={[{ required: true, message: 'Please select a combination' }]}
                     >
                       <Select
-                        placeholder="Select a combination (e.g., A00)"
+                        placeholder={findMode === "combination" ? "Chọn khối xét tuyển (e.g., A00)" : "Chọn khối thi (e.g., KHTN)"}
                         onChange={onComboChange}
-                        options={evaluationCombinations.map((item) => ({
+                        options={ findMode === "combination"  ? 
+                          
+                          
+                          evaluationCombinations.map((item) => ({
                           label: item.label,
                           value: item.label,
-                        }))}
+                        }))
+                      
+                        : examCombination.map((item) => ({
+                          label: item.label,
+                          value: item.label
+                        }))
+                      }
                       />
                     </Form.Item>
+
       
                     {/* Map through subjects and generate score inputs */}
                     {subjects.map((subject) => (
@@ -131,12 +207,12 @@ const FindSchool : React.FC = () => {
               {/* Right Column: Results (Larger width) */}
               <Col xs={24} lg={16}>
                 <Card>
-                  {results.length > 0 ? (
+                  {results.size > 0 ? (
                     <>
                       <Title level={4} style={{color:'#1e894e'}}>Trường Đại Học Phù Hợp</Title>
                       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                         <Table
-                          dataSource={results}
+                          dataSource={Array.from(results)}
                           columns={columns}
                           rowKey={(record) => `${record.name}-${record.major}`}
                           pagination={false}
