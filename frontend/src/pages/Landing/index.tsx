@@ -78,6 +78,7 @@ const steps = [
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   
+  
   return (
     <Layout>
       <Content>
