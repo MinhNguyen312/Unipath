@@ -183,7 +183,7 @@ const FindSchool : React.FC = () => {
                         labelCol={{ span: 6 }}  
                         wrapperCol={{ span: '100%' }}
                         labelAlign="left"  
-                        label={findMode === "combination" ? "Tổ hợp xét tuyển" : "Khối thi"}
+                        label={findMode === "combination" ? "Tổ hợp" : "Khối thi"}
                         name="combination"
                         
                         rules={[{ required: true, message: 'Please select a combination' }]}
