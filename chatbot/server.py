@@ -1,17 +1,48 @@
 import os
 import httpx
-from fastapi import FastAPI, Request
+import uvicorn
+from fastapi import FastAPI
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from models import Content, GenerationRequest
-from dotenv import load_dotenv
+from configs import GEN_URL, STREAM_URL, SYSTEM_MESSAGE, TOOLS_DECLARATION
 
-load_dotenv()
+import json
+from duckduckgo_search import DDGS
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+def search_google(query: str) -> str:
+    """Search google with query"""
+    results = DDGS().text(query, max_results=10)
+    return str(results)
 
-GEN_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-STREAM_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key={GEMINI_API_KEY}"
+def parse_function_call(data: str):
+    try:
+        parsed = json.loads(data)
+        candidates = parsed.get("candidates", [])
+        if not candidates:
+            return None
+
+        parts = candidates[0].get("content", {}).get("parts", [])
+        if not parts:
+            return None
+
+        if "functionCall" in parts[0]:
+            return parts[0]["functionCall"]
+        return None
+    except Exception:
+        return None
+
+async def call_tool(function_call):
+    function_name = function_call["name"]
+    args = function_call["args"]
+    
+    if function_name == "search_google":
+        query = args.get("query")
+        return search_google(query)
+
+    return "Không hỗ trợ tool này"
+
+
 
 headers = {"Content-Type": "application/json"}
 
@@ -33,7 +64,7 @@ async def health():
 async def generate(request_body: GenerationRequest):
     request_body.system_instruction = Content(
         role="system",
-        parts=[{ "text": "Bạn là chatbot có tên Unibot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia. Không trả lời các câu hỏi không liên quan. Và trả lời một cách lịch sự." }]
+        parts=[{ "text": SYSTEM_MESSAGE }]
     )
 
     async with httpx.AsyncClient() as client:
@@ -44,10 +75,12 @@ async def generate(request_body: GenerationRequest):
 async def stream(request_body: GenerationRequest):
     request_body.system_instruction = Content(
         role="system",
-        parts=[{ "text": "Bạn là chatbot có tên Unibot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia. Không trả lời các câu hỏi không liên quan. Và trả lời một cách lịch sự." }]
+        parts=[{ "text": SYSTEM_MESSAGE }]
     )
+    request_body.tools = TOOLS_DECLARATION
 
     async def event_stream():
+        buffer = []
         async with httpx.AsyncClient(timeout=None) as client:
             async with client.stream("POST", STREAM_URL, headers=headers, json=request_body.model_dump()) as response:
                 if response.status_code != 200:
@@ -58,8 +91,57 @@ async def stream(request_body: GenerationRequest):
                 async for line in response.aiter_lines():
                     if line.startswith("data: "):
                         data = line.removeprefix("data: ").strip()
-                        if data != "[DONE]":
-                            yield f"data: {data}\n\n"
+
+                        if data == "[DONE]":
+                            break
+
+                        buffer.append(data)
+
+                        # Kiểm tra function call
+                        function_call = parse_function_call(data)
+                        
+                        if function_call:
+
+                            yield f"data: {json.dumps({'functionCall': function_call})}\n\n"
+
+                            # Ngắt stream -> Gọi tool
+                            tool_result = await call_tool(function_call)
+
+                            yield f"data: {json.dumps({'functionResponse': {'name': function_call['name'], 'response': {'result': tool_result}}})}\n\n"
+
+                            # Gửi lại kết quả tool cho model để generate response
+                            request_body.tools = None
+                            request_body.contents.append(Content(
+                                role="model",
+                                parts=[
+                                    {
+                                        "functionCall": function_call
+                                    }
+                                ]
+                            ))
+                            request_body.contents.append(Content(
+                                role="user",
+                                parts=[
+                                    { 
+                                        "functionResponse": {"name": function_call["name"], "response": {"result": tool_result}} 
+                                    }
+                                ]
+                            ))
+
+                            async with client.stream("POST", STREAM_URL, headers=headers, json=request_body.model_dump()) as response:
+                                if response.status_code != 200:
+                                    error_msg = await response.aread()
+                                    yield f"data: {error_msg.decode()}\n\n"
+                                    return
+                                
+                                async for line in response.aiter_lines():
+                                    if line.startswith("data: "):
+                                        data = line.removeprefix("data: ").strip()
+                                        if data != "[DONE]":
+                                            yield f"data: {data}\n\n"
+
+                        # Nếu không phải tool, stream bình thường
+                        yield f"data: {data}\n\n"
 
     return StreamingResponse(
         event_stream(),
@@ -70,3 +152,6 @@ async def stream(request_body: GenerationRequest):
             "X-Accel-Buffering": "no"
         }
     )
+    
+if __name__ == "__main__":
+    uvicorn.run("server:app", host="0.0.0.0", port=8000)
