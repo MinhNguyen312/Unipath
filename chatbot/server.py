@@ -32,17 +32,12 @@ def parse_function_call(data: str):
     except Exception:
         return None
 
+tools_map = {'search_google': search_google}
+
 async def call_tool(function_call):
-    function_name = function_call["name"]
-    args = function_call["args"]
-    
-    if function_name == "search_google":
-        query = args.get("query")
-        return search_google(query)
-
-    return "Không hỗ trợ tool này"
-
-
+    tool_to_call = tools_map[function_call["name"]]
+    result = tool_to_call(**function_call["args"])
+    return result
 
 headers = {"Content-Type": "application/json"}
 
@@ -62,27 +57,29 @@ async def health():
 
 @app.post("/generate")
 async def generate(request_body: GenerationRequest):
-    request_body.system_instruction = Content(
-        role="system",
-        parts=[{ "text": SYSTEM_MESSAGE }]
-    )
+    request_body_dict = request_body.model_dump()
+
+    request_body_dict["system_instruction"] = {
+        "parts": [{ "text": SYSTEM_MESSAGE }]
+    }
 
     async with httpx.AsyncClient() as client:
-        res = await client.post(GEN_URL, headers=headers, json=request_body.model_dump())
+        res = await client.post(GEN_URL, headers=headers, json=request_body_dict)
         return JSONResponse(content=res.json())
 
 @app.post("/stream")
 async def stream(request_body: GenerationRequest):
-    request_body.system_instruction = Content(
-        role="system",
-        parts=[{ "text": SYSTEM_MESSAGE }]
-    )
-    request_body.tools = TOOLS_DECLARATION
+    request_body_dict = request_body.model_dump()
+
+    request_body_dict["system_instruction"] = {
+        "parts": [{ "text": SYSTEM_MESSAGE }]
+    }
+    request_body_dict["tools"] = TOOLS_DECLARATION
 
     async def event_stream():
         buffer = []
         async with httpx.AsyncClient(timeout=None) as client:
-            async with client.stream("POST", STREAM_URL, headers=headers, json=request_body.model_dump()) as response:
+            async with client.stream("POST", STREAM_URL, headers=headers, json=request_body_dict) as response:
                 if response.status_code != 200:
                     error_msg = await response.aread()
                     yield f"data: {error_msg.decode()}\n\n"
@@ -110,25 +107,25 @@ async def stream(request_body: GenerationRequest):
                             yield f"data: {json.dumps({'functionResponse': {'name': function_call['name'], 'response': {'result': tool_result}}})}\n\n"
 
                             # Gửi lại kết quả tool cho model để generate response
-                            request_body.tools = None
-                            request_body.contents.append(Content(
-                                role="model",
-                                parts=[
+                            request_body_dict.pop("tools", None)
+                            request_body_dict["contents"].append({
+                                "role": "model",
+                                "parts": [
                                     {
                                         "functionCall": function_call
                                     }
                                 ]
-                            ))
-                            request_body.contents.append(Content(
-                                role="user",
-                                parts=[
-                                    { 
+                            })
+                            request_body_dict["contents"].append({
+                                "role": "user",
+                                "parts": [
+                                    {
                                         "functionResponse": {"name": function_call["name"], "response": {"result": tool_result}} 
                                     }
                                 ]
-                            ))
+                            })
 
-                            async with client.stream("POST", STREAM_URL, headers=headers, json=request_body.model_dump()) as response:
+                            async with client.stream("POST", STREAM_URL, headers=headers, json=request_body_dict) as response:
                                 if response.status_code != 200:
                                     error_msg = await response.aread()
                                     yield f"data: {error_msg.decode()}\n\n"
