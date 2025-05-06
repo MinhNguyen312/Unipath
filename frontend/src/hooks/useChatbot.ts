@@ -1,5 +1,7 @@
 export function useChatbot(
   onMessage: (chunk: string) => void,
+  onFunctionCall: (name: string, args: any) => void,
+  onFunctionResponse: (name: string, response: any) => void,
   onDone: () => void,
   onError: () => void
 ) {
@@ -43,6 +45,17 @@ export function useChatbot(
 
               try {
                 const json = JSON.parse(data);
+                if (json.functionCall) {
+                  onFunctionCall(json.functionCall.name, json.functionCall.args);
+                  continue;
+                }
+                if (json.functionResponse) {
+                  onFunctionResponse(
+                    json.functionResponse.name, 
+                    json.functionResponse.response
+                  );
+                  continue;
+                }
                 const part = json.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (part) onMessage(part);
               } catch (e) {

@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import AsyncExitStack
 from mcp import ClientSession, StdioServerParameters
-from mcp.client.sse import sse_client
+from mScp.client.sse import sse_client
 
 class ConnectionManager:
     def __init__(self, sse_server_map):

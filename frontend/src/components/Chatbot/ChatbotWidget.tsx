@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button, Input, ConfigProvider } from "antd";
-import { MessageOutlined, CloseOutlined, ReloadOutlined, DownOutlined } from "@ant-design/icons";
+import { MessageOutlined, CloseOutlined, ReloadOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useChatbot } from "../../hooks/useChatbot";
 import ReactMarkdown from "react-markdown";
 
@@ -9,6 +9,7 @@ const { TextArea } = Input;
 interface Message {
   content: string;
   isUser: boolean;
+  isSearching?: boolean;
 }
 
 const styles = {
@@ -61,24 +62,46 @@ const styles = {
     maxWidth: "80%",
     whiteSpace: "pre-wrap" as const,
   }),
+  searchingIndicator: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "8px 12px",
+    background: "#e0e0e0",
+    borderRadius: 16,
+    alignSelf: "flex-start" as const,
+    color: "#333",
+    fontSize: 14,
+  }
 };
 
-const MessageBubble = ({ content, isUser }: Message) => (
-  <div style={{ 
-    ...styles.message(isUser), 
-    wordWrap: 'break-word', 
-    overflowWrap: 'break-word',
-    whiteSpace: 'pre-wrap',
-  }}>
-    <ReactMarkdown
-        components={{
-          p: ({ children }) => <div style={{ margin: 0, padding: 0 }}>{children}</div>,
-        }}
-      >
-        {content.trim()}
-    </ReactMarkdown>
-  </div>
-);
+const MessageBubble = ({ content, isUser, isSearching }: Message) => {
+  if (isSearching) {
+    return (
+      <div style={styles.searchingIndicator}>
+        <SearchOutlined />
+        <span>Đang tìm kiếm thông tin...</span>
+      </div>
+    );
+  }
+  
+  return (
+    <div style={{ 
+      ...styles.message(isUser), 
+      wordWrap: 'break-word', 
+      overflowWrap: 'break-word',
+      whiteSpace: 'pre-wrap',
+    }}>
+      <ReactMarkdown
+          components={{
+            p: ({ children }) => <div style={{ margin: 0, padding: 0 }}>{children}</div>,
+          }}
+        >
+          {content.trim()}
+      </ReactMarkdown>
+    </div>
+  );
+};
 
 const ChatHeader = ({ onReset }: { onReset: () => void }) => (
   <div style={{ ...styles.header, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -146,6 +169,7 @@ export default function ChatbotWidget() {
   const hasAppended = useRef(false);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
 
   const streamChat = useChatbot(
@@ -154,6 +178,26 @@ export default function ChatbotWidget() {
         content: (prev?.content || "") + text,
         isUser: false,
       }));
+    },
+    (name: string, args: any) => {
+      console.log(`Function call: ${name}`, args);
+      
+      if (name === "search_google") {
+        setIsSearching(true);
+        setMessages((prev) => [...prev, { 
+          content: "", 
+          isUser: false,
+          isSearching: true
+        }]);
+      }
+    },
+    (name: string, response: any) => {
+      console.log(`Function response: ${name}`, response);
+      
+      if (name === "search_google") {
+        setIsSearching(false);
+        setMessages((prev) => prev.filter(msg => !msg.isSearching));
+      }
     },
     () => {
       setLiveMessage((msg) => {
