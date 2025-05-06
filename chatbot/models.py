@@ -6,5 +6,4 @@ class Content(BaseModel):
     parts: List[dict]
 
 class GenerationRequest(BaseModel):
-    system_instruction: Optional[Content] = None
     contents: List[Content]
