@@ -137,8 +137,9 @@ async def stream(request_body: GenerationRequest):
                                         if data != "[DONE]":
                                             yield f"data: {data}\n\n"
 
-                        # Nếu không phải tool, stream bình thường
-                        yield f"data: {data}\n\n"
+                        else:
+                            # Nếu không phải tool, stream bình thường
+                            yield f"data: {data}\n\n"
 
     return StreamingResponse(
         event_stream(),
