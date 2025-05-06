@@ -12,7 +12,7 @@ const TableauEmbed = () => {
         border: '10px solid white',
       }}
     >
-      <iframe title="Tableau Dashboard" width="80%" height="100%" src={url} style={{border: 'none'}} />
+      <iframe title="Tableau Dashboard" width="85%" height="100%" src={url} style={{border: 'none'}} />
     </div>
   );
 };

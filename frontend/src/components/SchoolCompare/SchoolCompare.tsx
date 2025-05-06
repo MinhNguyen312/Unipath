@@ -8,6 +8,7 @@ import { useUniversitiesByMajor } from "../../hooks/useUniversitiesByMajors"
 import { useMajorInfo } from "../../hooks/useMajorInfo"
 import { useScoreChart } from "../../hooks/useScoreChart"
 import ScoreChart from "./ScoreChart"
+import "./styles.css"
 
 const { Title } = Typography
 
@@ -139,7 +140,7 @@ export default function SchoolComparison() {
           )}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+        <div className="school-selectors">
           {[0, 1, 2].map((index) => (
             <div key={index} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               <label style={{ fontSize: "18px", fontWeight: "bold", color: "#2e7d32" }}>Trường</label>

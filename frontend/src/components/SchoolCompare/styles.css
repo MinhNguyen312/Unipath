@@ -1,0 +1,12 @@
+.school-selectors {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  @media (min-width: 768px) {
+    .school-selectors {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
