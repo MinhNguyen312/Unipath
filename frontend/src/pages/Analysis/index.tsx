@@ -1,17 +1,15 @@
 import React from 'react';
 import { Layout } from 'antd';
-import SchoolComparison from '../../components/SchoolCompare/SchoolCompare';
 import './styles.css';
 const { Content } = Layout;
 
-const Finder: React.FC = () => {
+const Analysis: React.FC = () => {
   return (
     <Layout>
-      <Content className="finder-content">
-        <SchoolComparison />
+      <Content className="analysis-content">
       </Content>
     </Layout>
   );
 };
 
-export default Finder; 
+export default Analysis; 
