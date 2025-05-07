@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-google-genai
 python-dotenv
 mcp[cli]
 duckduckgo-search
