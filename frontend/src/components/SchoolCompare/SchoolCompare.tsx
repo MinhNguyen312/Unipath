@@ -91,9 +91,21 @@ export default function SchoolComparison() {
     {
       key: "4",
       info: <strong style={{ color: "#2e7d32" }}>Điểm chuẩn</strong>,
-      school0: scoreChart1 ? <ScoreChart data={scoreChart1} /> : "-",
-      school1: scoreChart2 ? <ScoreChart data={scoreChart2} /> : "-",
-      school2: scoreChart3 ? <ScoreChart data={scoreChart3} /> : "-",
+      school0: scoreChart1 ? (
+        <div style={{ width: 300, height: 150 }}>
+          <ScoreChart data={scoreChart1} />
+        </div>
+      ) : "-",
+      school1: scoreChart2 ? (
+        <div style={{ width: 300, height: 150 }}>
+          <ScoreChart data={scoreChart2} />
+        </div>
+      ) : "-",
+      school2: scoreChart3 ? (
+        <div style={{ width: 300, height: 150 }}>
+          <ScoreChart data={scoreChart3} />
+        </div>
+      ) : "-",
     }
   ]
 

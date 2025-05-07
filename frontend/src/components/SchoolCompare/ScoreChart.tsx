@@ -61,11 +61,14 @@ export default function ScoreChart({ data }: ScoreChartProps) {
         ticks: { font: { size: 10 } },
       },
       y: {
-        beginAtZero: true,   
+        beginAtZero: true,
+        min: 0,
+        max: 30,
         ticks: {
           font: {
             size: 10,
           },
+          stepSize: 5,
         },
       },
     },
