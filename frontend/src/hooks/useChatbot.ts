@@ -1,5 +1,7 @@
 export function useChatbot(
   onMessage: (chunk: string) => void,
+  onFunctionCall: (name: string, args: any) => void,
+  onFunctionResponse: (name: string, response: any) => void,
   onDone: () => void,
   onError: () => void
 ) {
@@ -16,14 +18,6 @@ export function useChatbot(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          system_instruction: {
-            role: "system",
-            parts: [
-              {
-                text: "Bạn là Unibot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia.",
-              },
-            ],
-          },
           contents: formattedMessages,
         }),
       });
@@ -51,6 +45,17 @@ export function useChatbot(
 
               try {
                 const json = JSON.parse(data);
+                if (json.functionCall) {
+                  onFunctionCall(json.functionCall.name, json.functionCall.args);
+                  continue;
+                }
+                if (json.functionResponse) {
+                  onFunctionResponse(
+                    json.functionResponse.name, 
+                    json.functionResponse.response
+                  );
+                  continue;
+                }
                 const part = json.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (part) onMessage(part);
               } catch (e) {
