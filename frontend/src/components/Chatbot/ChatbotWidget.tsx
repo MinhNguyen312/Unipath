@@ -3,8 +3,12 @@ import { Button, Input, ConfigProvider } from "antd";
 import { MessageOutlined, CloseOutlined, ReloadOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useChatbot } from "../../hooks/useChatbot";
 import ReactMarkdown from "react-markdown";
-
+import { SendOutlined } from "@ant-design/icons";
+import { majorCompareCache } from "../../hooks/useCompareStore";
+import remarkGfm from 'remark-gfm';
 const { TextArea } = Input;
+import { Switch } from 'antd'
+
 
 interface Message {
   content: string;
@@ -22,13 +26,16 @@ const styles = {
     height: 56,
     backgroundColor: "#1E894E",
     boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+    borderRadius: "50%",
   },
   popup: {
     position: "fixed" as const,
     bottom: 90,
     right: 24,
-    width: 400,
-    height: 500,
+    width: "90vw",
+    maxWidth: 400,
+    height: "80vh",
+    maxHeight: 600,
     background: "#fff",
     borderRadius: 12,
     boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
@@ -36,7 +43,7 @@ const styles = {
     display: "flex",
     flexDirection: "column" as const,
     overflow: "hidden" as const,
-  },
+  },  
   header: {
     background: "#1E894E",
     padding: "10px 16px",
@@ -75,6 +82,22 @@ const styles = {
   }
 };
 
+const formatMajorCompareCache = (): string => {
+  if (Object.keys(majorCompareCache).length === 0) {
+    return "Không có thông tin về các ngành đang so sánh.";
+  }
+
+  let result = "Thông tin về các ngành đang so sánh:\n";
+  for (const key in majorCompareCache) {
+    const info = majorCompareCache[key];
+    result += `- Trường: ${info.university}, Ngành: ${info.major}, Thành phố: ${info.city}, Học phí: ${info.fee}, Khối thi: ${info.examBlocks.join(", ")}, Điểm chuẩn: ${info.scores
+      .map((s) => `${s.year}: ${s.score}`)
+      .join(", ")}\n`;
+  }
+  result += "Hãy sử dụng thông tin này để trả lời chi tiết về các ngành, so sánh, điểm chuẩn, học phí, hoặc trường nào phù hợp hơn.";
+  return result;
+};
+
 const MessageBubble = ({ content, isUser, isSearching }: Message) => {
   if (isSearching) {
     return (
@@ -93,11 +116,52 @@ const MessageBubble = ({ content, isUser, isSearching }: Message) => {
       whiteSpace: 'pre-wrap',
     }}>
       <ReactMarkdown
-          components={{
-            p: ({ children }) => <div style={{ margin: 0, padding: 0 }}>{children}</div>,
-          }}
-        >
-          {content.trim()}
+        remarkPlugins={[remarkGfm]}
+        components={{
+          p: ({ children }) => <div style={{ margin: 0, padding: 0 }}>{children}</div>,
+          table: ({ children }) => (
+            <table style={{ 
+              borderCollapse: 'collapse', 
+              width: '100%', 
+              margin: '10px 0',
+              border: '1px solid #000000'
+            }}>
+              {children}
+            </table>
+          ),
+          thead: ({ children }) => (
+            <thead style={{ backgroundColor: '#e0e0e0', border: '1px solid #000000' }}>{children}</thead>
+          ),
+          tbody: ({ children }) => <tbody>{children}</tbody>,
+          tr: ({ children }) => (
+            <tr style={{ backgroundColor: '#e0e0e0', border: '1px solid #000000' }}>
+              {children}
+            </tr>
+          ),
+          th: ({ children }) => (
+            <th style={{ 
+              border: '1px solid #000000', 
+              padding: '12px 8px', 
+              textAlign: 'center',
+              fontWeight: 'bold',
+              verticalAlign: 'middle'
+            }}>
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td style={{ 
+              border: '1px solid #000000', 
+              padding: '8px', 
+              textAlign: 'left',
+              verticalAlign: 'middle'
+            }}>
+              {children}
+            </td>
+          ),
+        }}
+      >
+        {content.trim()}
       </ReactMarkdown>
     </div>
   );
@@ -170,6 +234,7 @@ export default function ChatbotWidget() {
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [includeMajorCompare, setIncludeMajorCompare] = useState(true);
 
 
   const streamChat = useChatbot(
@@ -220,11 +285,34 @@ export default function ChatbotWidget() {
 
   const handleSend = () => {
     setIsComposing(true);
-    if (!message.trim()) return;
-    const userMsg = { content: message, isUser: true };
-    setMessages((prev) => [...prev, userMsg]);
+  if (!message.trim()) return;
+
+  let fullPrompt = message;
+
+    if (includeMajorCompare) {
+      if (Object.keys(majorCompareCache).length === 0) {
+        setMessages((prev) => [
+          ...prev,
+          { content: message, isUser: true },
+          {
+            content: "Hiện tại không có thông tin về các ngành so sánh. Vui lòng thêm ngành để so sánh trước.",
+            isUser: false,
+          },
+        ]);
+        setMessage("");
+        return;
+      }
+      fullPrompt = `${message}\n\n${formatMajorCompareCache()}`;
+    }
+
+    const displayUserMsg = { content: message, isUser: true };
+    const aiInput = { content: fullPrompt, isUser: true };
+
+    const updatedMessages = [...messages, displayUserMsg];
+    setMessages(updatedMessages);
     hasAppended.current = false;
-    streamChat([...messages, userMsg]);
+
+    streamChat([...messages, aiInput]);
     setMessage("");
     setLiveMessage(null);
   };
@@ -285,26 +373,52 @@ export default function ChatbotWidget() {
               />
           )}
           <div style={{ padding: "8px 12px", borderTop: "1px solid #eee" }}>
-            <TextArea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onPressEnter={(e) => {
-                if (!e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              rows={4}
-              placeholder="Nhập tin nhắn..."
-              style={{ 
-                resize: "none",
-                height: "80px",
-                minHeight: "60px"
-              }}
-            />
-            <Button type="primary" block style={{ marginTop: 8 }} onClick={handleSend}>
-              Gửi
-            </Button>
+            <div style={{ position: 'relative' }}>
+              <TextArea
+                disabled={isSearching}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onPressEnter={(e) => {
+                  if (!e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="Nhập tin nhắn..."
+                style={{ 
+                  resize: "none",
+                  height: "80px",
+                  minHeight: "60px"
+                }}
+                autoSize={{ minRows: 3, maxRows: 5 }}
+              />
+              <Switch
+                checked={includeMajorCompare}
+                onChange={(checked) => setIncludeMajorCompare(checked)}
+                size="small"
+                title="Bật/tắt thêm ngành so sánh"
+                style={{
+                  position: 'absolute',
+                  right: 50,
+                  bottom: 14,
+                }}
+              />
+              <Button
+                shape="circle"
+                icon={<SendOutlined />}
+                onClick={handleSend}
+                disabled={!message.trim() || isSearching}
+                style={{
+                  position: 'absolute',
+                  right: 8,
+                  bottom: 8,
+                  backgroundColor: message.trim() ? '#1E894E' : '#d0e5d9',
+                  border: 'none',
+                  color: message.trim() ? 'white' : '#888',
+                  transition: 'all 0.3s ease',
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

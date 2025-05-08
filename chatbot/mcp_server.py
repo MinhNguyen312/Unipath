@@ -8,10 +8,10 @@ mcp = FastMCP(
 )
 
 @mcp.tool()
-def search_google(query: str) -> list:
+def search_google(query: str) -> str:
     """Search google with query"""
     results = DDGS().text(query, max_results=10)
-    return results
+    return str(results)
 
 if __name__ == "__main__":
     mcp.run(transport='sse')

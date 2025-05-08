@@ -93,7 +93,7 @@ Sau đó server trả về cho client các response như:
 ```
 data: {"functionCall": {"name": "search_google", "args": {"query": "học phí 2025 đại học lạc hồng"}}}
 
-data: {"functionResponse": {"name": "get_information", "response": {"result": "kết quả tool"}}}
+data: {"functionResponse": {"name": "search_google", "response": {"result": "kết quả tool"}}}
 
 data: {"candidates": [{"content": {"parts": [{"text": "Học phí là"}],"role": "model"}}],"usageMetadata": {"promptTokenCount": 2956,"totalTokenCount": 2956,"promptTokensDetails": [{"modality": "TEXT","tokenCount": 2956}]},"modelVersion": "gemini-2.0-flash"}
 
@@ -132,7 +132,7 @@ curl "http://localhost:8000/stream" \
         "role": "user",
         "parts": [
           {
-            "functionResponse": {"name": "get_information", "response": {"result": "kết quả tool"}}
+            "functionResponse": {"name": "search_google", "response": {"result": "kết quả tool"}}
           }
         ]
       },

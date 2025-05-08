@@ -8,6 +8,7 @@ import { useUniversitiesByMajor } from "../../hooks/useUniversitiesByMajors"
 import { useMajorInfo } from "../../hooks/useMajorInfo"
 import { useScoreChart } from "../../hooks/useScoreChart"
 import ScoreChart from "./ScoreChart"
+import { majorCompareCache } from "../../hooks/useCompareStore"
 
 const { Title } = Typography
 
@@ -33,6 +34,11 @@ export default function SchoolComparison() {
 
   const handleSubmit = () => {
     const validSchools = schools.filter((school) => school !== "")
+    Object.keys(majorCompareCache).forEach((cachedSchool) => {
+      if (!validSchools.includes(cachedSchool)) {
+        delete majorCompareCache[cachedSchool];
+      }
+    });
     setSubmittedSchools(validSchools)
     setShowTable(validSchools.length > 0)
   }
@@ -64,6 +70,37 @@ export default function SchoolComparison() {
 
     return cols
   }, [submittedSchools])
+  
+  React.useEffect(() => {
+    const datas = [data1, data2, data3];
+    const scores = [scoreChart1, scoreChart2, scoreChart3];
+    const loadings = [loading1, loading2, loading3];
+  
+    submittedSchools.forEach((school, index) => {
+      const data = datas[index];
+      const score = scores[index];
+      const loading = loadings[index];
+  
+      if (!loading && data && score) {
+        majorCompareCache[school] = {
+          university: school,
+          major: selectedMajor,
+          city: data.dia_diem || "-",
+          fee: data.hoc_phi || "-",
+          examBlocks: [data.to_hop_mon || "-"],
+          scores: score.map((s: { nam: number; diem: number }) => ({ year: s.nam, score: s.diem })),
+        };
+      }
+    });
+  }, [
+    data1, data2, data3,
+    scoreChart1, scoreChart2, scoreChart3,
+    loading1, loading2, loading3,
+    submittedSchools,
+    selectedMajor
+  ]);
+  
+
 
   const dataSource: RowData[] = [
     {

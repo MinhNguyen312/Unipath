@@ -1,14 +1,14 @@
-import os
 import httpx
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from models import Content, GenerationRequest
-from configs import GEN_URL, STREAM_URL, SYSTEM_MESSAGE, TOOLS_DECLARATION
-
+from configs import HEADERS, GEN_URL, STREAM_URL, SYSTEM_MESSAGE, TOOLS_DECLARATION, SSE_SERVER_MAP
 import json
 from duckduckgo_search import DDGS
+from connection_manager import ConnectionManager
+from contextlib import asynccontextmanager
 
 def search_google(query: str) -> str:
     """Search google with query"""
@@ -24,7 +24,7 @@ def parse_function_call(data: str):
 
         parts = candidates[0].get("content", {}).get("parts", [])
         if not parts:
-            return None
+           return None
 
         if "functionCall" in parts[0]:
             return parts[0]["functionCall"]
@@ -39,9 +39,20 @@ async def call_tool(function_call):
     result = tool_to_call(**function_call["args"])
     return result
 
-headers = {"Content-Type": "application/json"}
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    conn_manager = ConnectionManager(SSE_SERVER_MAP)
+    await conn_manager.initialize()
+    app.state.conn_manager = conn_manager
 
-app = FastAPI()
+    tool_map, _ = await conn_manager.list_tools()
+    app.state.tool_map = tool_map
+
+    yield  # ứng với khi app đang chạy
+
+    await conn_manager.close()  # ứng với khi app tắt
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -51,9 +62,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def hello_world():
+    return "hello world"
+
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "healthy"}
 
 @app.post("/generate")
 async def generate(request_body: GenerationRequest):
@@ -64,7 +79,7 @@ async def generate(request_body: GenerationRequest):
     }
 
     async with httpx.AsyncClient() as client:
-        res = await client.post(GEN_URL, headers=headers, json=request_body_dict)
+        res = await client.post(GEN_URL, headers=HEADERS, json=request_body_dict)
         return JSONResponse(content=res.json())
 
 @app.post("/stream")
@@ -79,7 +94,7 @@ async def stream(request_body: GenerationRequest):
     async def event_stream():
         buffer = []
         async with httpx.AsyncClient(timeout=None) as client:
-            async with client.stream("POST", STREAM_URL, headers=headers, json=request_body_dict) as response:
+            async with client.stream("POST", STREAM_URL, headers=HEADERS, json=request_body_dict) as response:
                 if response.status_code != 200:
                     error_msg = await response.aread()
                     yield f"data: {error_msg.decode()}\n\n"
@@ -104,7 +119,10 @@ async def stream(request_body: GenerationRequest):
                             # Ngắt stream -> Gọi tool
                             tool_result = await call_tool(function_call)
 
-                            yield f"data: {json.dumps({'functionResponse': {'name': function_call['name'], 'response': {'result': tool_result}}})}\n\n"
+                            tool_result = await app.state.conn_manager.call_tool(function_call['name'], function_call['args'], app.state.tool_map)
+
+
+                            yield f"data: {json.dumps({'functionResponse': {'name': function_call['name'], 'response': {'result': tool_result}}}, ensure_ascii=False)}\n\n"
 
                             # Gửi lại kết quả tool cho model để generate response
                             request_body_dict.pop("tools", None)
@@ -125,7 +143,7 @@ async def stream(request_body: GenerationRequest):
                                 ]
                             })
 
-                            async with client.stream("POST", STREAM_URL, headers=headers, json=request_body_dict) as response:
+                            async with client.stream("POST", STREAM_URL, headers=HEADERS, json=request_body_dict) as response:
                                 if response.status_code != 200:
                                     error_msg = await response.aread()
                                     yield f"data: {error_msg.decode()}\n\n"
