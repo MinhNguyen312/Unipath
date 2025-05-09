@@ -3,6 +3,8 @@ import React, {useState} from "react";
 import type { ColumnsType } from 'antd/es/table';
 import { evaluationCombinations } from "../../data/evaluationCombinations";
 import axios from "axios";
+import { SearchOutlined } from "@ant-design/icons";
+import './styles.css';
 
 const {Title} = Typography;
 const {Content} = Layout;
@@ -37,8 +39,13 @@ const FindSchool : React.FC = () => {
     const [subjects, setSubjects] = useState<string[]>([]);
     const [results, setResults] = useState<University[]>([]);
     const [findMode, setFindMode] = useState<string>("combination"); 
+    const [selectedRow,setSelectedRow] = useState<University | null>(null);
+    const [hoveredRow, setHoveredRow] = useState<University | null>(null);
 
-
+    
+    const handleCompare = (first: University, second: University) => {
+      console.log("Comparing", first, " and", second);
+  }
 
     const onComboChange = (value: string) => {
 
@@ -52,7 +59,6 @@ const FindSchool : React.FC = () => {
         setSubjects(combo ? combo.value : []);
       }      
     };
-  
 
     const onFinish = async (values: FormValues) => {  
         console.log(values);
@@ -123,6 +129,28 @@ const FindSchool : React.FC = () => {
 
   
     const columns: ColumnsType<University> = [
+      {
+        title: 'Hành động',
+        key: 'action',
+        render: (_, record) => {
+          if (
+            selectedRow &&
+            hoveredRow?.code === record.code &&
+            selectedRow.code !== record.code
+          ) {
+            return (
+              <Button
+                type="link"
+                onClick={(e) => {e.stopPropagation();handleCompare(selectedRow, record)}}
+                style={{backgroundColor: '#1e894e'}}
+              >
+                <SearchOutlined style={{color:"white"}}/>
+              </Button>
+            );
+          }
+          return null;
+        }
+      },
       { title: 'Tên Trường', dataIndex: 'name', key: 'name' },
       { title: 'Mã Ngành', dataIndex:'code', key: 'code'},
       { title: 'Ngành', dataIndex: 'major', key: 'major' },
@@ -244,14 +272,23 @@ const FindSchool : React.FC = () => {
                 <Card>
                   {results.length > 0 ? (
                     <>
-                      <Title level={4} style={{color:'#1e894e'}}>Trường Đại Học Phù Hợp</Title>
+                      <Title level={4} style={{color:'#1e894e'}}>Ngành Học Phù Hợp</Title>
                       <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                         <Table
+                          
                           dataSource={Array.from(results)}
                           columns={columns}
                           rowKey={(record) => `${record.name}-${record.major}`}
                           pagination={false}
                           scroll={{ x: 'max-content' }}
+                          onRow={(record) => ({
+                            onClick: () => {console.log(record);setSelectedRow(record)},
+                            onMouseEnter: () => {setHoveredRow(record)},
+                            onMouseLeave: () => {setHoveredRow(null)}
+                          })}
+                          rowClassName={(record) =>
+                            selectedRow?.code === record.code ? 'selected-row' : ''
+                          }
                         />
                       </div>
                     </>
