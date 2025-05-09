@@ -246,22 +246,27 @@ export default function ChatbotWidget() {
     },
     (name: string, args: any) => {
       console.log(`Function call: ${name}`, args);
-      
       if (name === "search_google") {
         setIsSearching(true);
         setMessages((prev) => [...prev, { 
-          content: "", 
+          content: args, 
           isUser: false,
           isSearching: true
         }]);
+        hasAppended.current = false;
       }
     },
     (name: string, response: any) => {
       console.log(`Function response: ${name}`, response);
-      
       if (name === "search_google") {
         setIsSearching(false);
-        setMessages((prev) => prev.filter(msg => !msg.isSearching));
+        const botMsg = {
+          content: response,
+          isUser: false,
+          isSearching: false
+        };
+        setMessages((prev) => [...prev.filter(msg => !msg.isSearching), botMsg]);
+        hasAppended.current = false;
       }
     },
     () => {
@@ -271,6 +276,7 @@ export default function ChatbotWidget() {
           hasAppended.current = true;
         }
         setIsComposing(false);
+        setIsSearching(false);
         return null;
       });
     },
@@ -280,17 +286,21 @@ export default function ChatbotWidget() {
         { content: "Server lỗi", isUser: false },
       ]);
       setLiveMessage(null);
+      setIsSearching(false);
+      setIsComposing(false);
     }
   );
 
   const handleSend = () => {
-    setIsComposing(true);
+  setIsComposing(true);
   if (!message.trim()) return;
 
   let fullPrompt = message;
 
+  const isComparisonQuestion = /so sánh|compare|khác nhau|khác biệt/i.test(message);
+
     if (includeMajorCompare) {
-      if (Object.keys(majorCompareCache).length === 0) {
+      if (Object.keys(majorCompareCache).length === 0 && isComparisonQuestion) {
         setMessages((prev) => [
           ...prev,
           { content: message, isUser: true },

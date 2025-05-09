@@ -6,14 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from models import Content, GenerationRequest
 from configs import HEADERS, GEN_URL, STREAM_URL, SYSTEM_MESSAGE, TOOLS_DECLARATION, SSE_SERVER_MAP
 import json
-from duckduckgo_search import DDGS
 from connection_manager import ConnectionManager
 from contextlib import asynccontextmanager
-
-def search_google(query: str) -> str:
-    """Search google with query"""
-    results = DDGS().text(query, max_results=10)
-    return str(results)
 
 def parse_function_call(data: str):
     try:
@@ -31,13 +25,6 @@ def parse_function_call(data: str):
         return None
     except Exception:
         return None
-
-tools_map = {'search_google': search_google}
-
-async def call_tool(function_call):
-    tool_to_call = tools_map[function_call["name"]]
-    result = tool_to_call(**function_call["args"])
-    return result
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -117,10 +104,8 @@ async def stream(request_body: GenerationRequest):
                             yield f"data: {json.dumps({'functionCall': function_call})}\n\n"
 
                             # Ngắt stream -> Gọi tool
-                            tool_result = await call_tool(function_call)
 
                             tool_result = await app.state.conn_manager.call_tool(function_call['name'], function_call['args'], app.state.tool_map)
-
 
                             yield f"data: {json.dumps({'functionResponse': {'name': function_call['name'], 'response': {'result': tool_result}}}, ensure_ascii=False)}\n\n"
 
