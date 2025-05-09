@@ -35,6 +35,9 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
+#Ignore all csv files in backend/csv-file
+backend/csv-file/*.csv
+
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
@@ -119,6 +122,8 @@ dist
 # FuseBox cache
 .fusebox/
 
+*.csv
+
 # DynamoDB Local files
 .dynamodb/
 
@@ -127,6 +132,7 @@ dist
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
+
 
 # yarn v2
 .yarn/cache

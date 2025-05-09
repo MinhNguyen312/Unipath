@@ -1,0 +1,27 @@
+.school-selectors {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  @media (min-width: 768px) {
+    .school-selectors {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .scroll-container {
+    max-width: 250px;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  
+  .scroll-text {
+    text-overflow: ellipsis;
+    display: inline-block;
+    white-space: nowrap;
+    transform: translateX(0);
+  }

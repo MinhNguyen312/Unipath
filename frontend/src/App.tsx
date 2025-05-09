@@ -6,7 +6,11 @@ import {App as AntdApp} from 'antd'
 import './App.css'
 import Navbar from './components/Navbar'
 import Landing from './pages/Landing'
+import Analysis from './pages/Analysis'
 import AppFooter from './components/AppFooter'
+import ChatbotWidget from './components/Chatbot/ChatbotWidget'
+import FindSchool from './pages/FindSchool'
+import { useEffect } from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,6 +20,26 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+const TableauPreloader = () => {
+  useEffect(() => {
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://public.tableau.com/views/Unipath/Chung?:embed=true';
+    iframe.style.width = '0px';
+    iframe.style.height = '0px';
+    iframe.style.border = 'none';
+    iframe.style.position = 'absolute';
+    iframe.style.left = '-9999px';
+    iframe.loading = 'eager';
+    document.body.appendChild(iframe);
+
+    return () => {
+      document.body.removeChild(iframe);
+    };
+  }, []);
+
+  return null; // không render gì
+};
 
 function App() {
   return (
@@ -38,16 +62,17 @@ function App() {
           <Router>
             <div className="app-container">
               <header>
+                <TableauPreloader />
                 <Navbar />
               </header>
 
               <main>
                 <Routes>
                   <Route path="/" element={<Landing />} />
-                  {/* <Route path="/about" element={<AboutPage />} />
-                  <Route path="/dashboard" element={<Dashboard />} /> */}
-                  
+                  <Route path="/analytics" element={<Analysis />} />
+                  <Route path="/find_school" element={<FindSchool/>} />
                 </Routes>
+                <ChatbotWidget />
               </main>
 
               <footer>
