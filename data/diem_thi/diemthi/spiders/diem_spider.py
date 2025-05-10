@@ -23,7 +23,7 @@ class DiemSpider(scrapy.Spider):
         for province in range(self.start_province, self.end_province + 1):
             start_sbd = f"{province:02}000001"
             yield scrapy.Request(
-                url=f"https://vietnamnet.vn/giao-duc/diem-thi/tra-cuu-diem-thi-tot-nghiep-thpt/2021/{start_sbd}.html",
+                url=f"https://vietnamnet.vn/giao-duc/diem-thi/tra-cuu-diem-thi-tot-nghiep-thpt/{self.year}/{start_sbd}.html",
                 callback=self.parse_score,
                 meta={
                     "province": province,
@@ -97,7 +97,7 @@ class DiemSpider(scrapy.Spider):
         next_number = number + 1
         next_sbd = f"{province:02}{next_number:06}"
         yield scrapy.Request(
-            url=f"https://vietnamnet.vn/giao-duc/diem-thi/tra-cuu-diem-thi-tot-nghiep-thpt/2021/{next_sbd}.html",
+            url=f"https://vietnamnet.vn/giao-duc/diem-thi/tra-cuu-diem-thi-tot-nghiep-thpt/{self.year}/{next_sbd}.html",
             callback=self.parse_score,
             meta={
                 "province": province,
