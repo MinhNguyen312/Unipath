@@ -216,6 +216,13 @@ const ChatContainer = ({
       const isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 10;
       setIsScrolledUp(!isAtBottom);
     }}>
+      <MessageBubble
+        content="Xin chào, tôi là Unibot - chuyên gia tư vấn tuyển sinh đại học và kỳ thi THPT quốc gia, tôi có thể giúp gì cho bạn?"
+        isUser={false}
+        isSearching={false}
+        functionCall={null}
+        functionResponse={null}
+      />
       {messages.map((msg, idx) => {
         const isLast = idx === messages.length - 1;
         if (msg.content !== null || (msg.isSearching && isLast)) {
