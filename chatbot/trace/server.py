@@ -24,8 +24,8 @@ class MetricsPayload(BaseModel):
     denial: int
 
 @app.get("/health")
-def health_check():
-    return {"status": "ok"}
+async def health():
+    return {"status": "healthy"}
 
 # Đẩy chat record vào celery task để thực hiện tính toán metrics
 @app.post("/calculate-metrics")

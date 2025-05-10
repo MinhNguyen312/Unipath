@@ -1,11 +1,11 @@
 import os
 from dotenv import load_dotenv
 
-SSE_SERVER_MAP = {
-    "python_executor_mcp": "http://localhost:8001/sse",
-}
-
 load_dotenv()
+
+SSE_SERVER_MAP = {
+    "python_executor_mcp": f"{os.getenv('CHATBOT_MCP_URL')}/sse",
+}
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 

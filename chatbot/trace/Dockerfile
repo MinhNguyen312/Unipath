@@ -2,10 +2,10 @@ FROM python:3.10-slim AS builder
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY requirements_copy.txt .
 
-RUN python3 -m pip install --upgrade pip \
- && python3 -m pip install --no-cache-dir --prefix=/install -r requirements.txt
+RUN pip install --upgrade pip \
+ && pip install --no-cache-dir --prefix=/install -r requirements_copy.txt
 
 FROM python:3.10-slim
 

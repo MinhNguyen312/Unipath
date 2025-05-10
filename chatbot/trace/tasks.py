@@ -23,7 +23,7 @@ celery_app = Celery(
     backend=os.getenv('CELERY_RESULT_BACKEND')
 )
 
-GEMINI_API_KEY = os.getenv('GOOGLE_API_KEY2')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY2')
 
 # Tính metrics cho câu trả lời của LLM
 def process_interaction(query: str, response: str):
@@ -69,7 +69,7 @@ def process_metrics(query: str, response: str, trace_id: str):
     )
 
     # Request API để cập nhật metrics vào prometheus
-    response = requests.post("http://trace-server:8002/update-metrics", json={
+    response = requests.post(f"{os.getenv('CHATBOT_TRACE_URL')}/update-metrics", json={
         "response": 1,
         "denial": 1 if is_denial == "DECLINE" else 0
     })
