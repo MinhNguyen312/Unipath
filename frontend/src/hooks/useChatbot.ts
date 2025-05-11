@@ -5,12 +5,26 @@ export function useChatbot(
   onDone: () => void,
   onError: () => void
 ) {
-  return async (messages: { content: string; isUser: boolean }[]) => {
+  return async (messages: { content: string | null; isUser: boolean; functionCall: JSON | null; functionResponse: JSON | null }[]) => {
     try {
-      const formattedMessages = messages.map((msg) => ({
-        role: msg.isUser ? "user" : "model",
-        parts: [{ text: msg.content }],
-      }));
+      const formattedMessages = messages.map((msg) => {
+        let role = msg.isUser ? "user" : "model";
+        let parts: { text?: string; functionCall?: JSON; functionResponse?: JSON }[] = [];
+        
+        if (msg.content && msg.content.trim() !== "") {
+          parts = [{ text: msg.content }];
+        } else if (msg.functionCall) {
+          parts = [{ functionCall: msg.functionCall }];
+        } else if (msg.functionResponse) {
+          role = "user";
+          parts = [{ functionResponse: msg.functionResponse }];
+        }
+  
+        return {
+          role,
+          parts,
+        };
+      });
 
       const res = await fetch(`${import.meta.env.VITE_CHATBOT_URL}/stream`, {
         method: "POST",
@@ -46,76 +60,14 @@ export function useChatbot(
               try {
                 const json = JSON.parse(data);
                 if (json.functionCall) {
-                  const { name, args } = json.functionCall;
-                
-
-                  if (name === "search_google" && args.query) {
-                    onFunctionCall(name, args);
-                  }
-
+                  onFunctionCall(json.functionCall.name, json.functionCall.args);
                   continue;
                 }
                 if (json.functionResponse) {
-                  const { name, response } = json.functionResponse;
-                
-                  if (name === "search_google") {
-                      console.log("Raw response:", response);
-                      let list;
-                
-                      if (typeof response === "object" && response !== null && "result" in response) {
-
-                        let result = response.result;
-                        if (typeof result === "string") {
-
-                          result = result.replace(/'/g, '"');
-                          list = JSON.parse(result);
-                        } else {
-                          list = result;
-                        }
-                      } else if (typeof response === "string") {
-
-                        const fixedResponse = response.replace(/'/g, '"');
-                        list = JSON.parse(fixedResponse);
-                      } else {
-                        list = response;
-                      }
-                
-                      console.log("Parsed list before adjustment:", list);
-                
-
-                      if (Array.isArray(list)) {
-
-                      } else if (list && typeof list === "object" && list.results && Array.isArray(list.results)) {
-                        list = list.results;
-                        console.log("Extracted results array:", list);
-                      } else if (list && typeof list === "object" && !Array.isArray(list)) {
-                        list = Object.values(list).filter(Array.isArray).flat();
-                        if (!Array.isArray(list) || list.length === 0) {
-                          throw new Error("Response does not contain a valid array");
-                        }
-                        console.log("Converted object to array:", list);
-                      } else {
-                        throw new Error("Response does not contain a valid array");
-                      }
-                
-
-                      const formatted = list
-                        .map((item: any, i: number) => {
-                          // if (!item || typeof item !== "object") {
-                          //   return `### Invalid result ${i + 1}(#)\nNo content available`;
-                          // }
-                          const title = item.title || `Result ${i + 1}`;
-                          const href = item.href || "#";
-                          const body = item.body || "No description available";
-                          const sanitizedTitle = title.replace(/[\]\)\(]/g, "");
-                          const sanitizedHref = href.replace(/[()]/g, "");
-                          const sanitizedBody = body.replace(/[\n\r]+/g, " ");
-                          return `### ${sanitizedTitle}(${sanitizedHref})\n${sanitizedBody}\n`;
-                        })
-                        .join("\n\n");
-                
-                        onFunctionResponse(name, formatted);
-                  }
+                  onFunctionResponse(
+                    json.functionResponse.name, 
+                    json.functionResponse.response
+                  );
                   continue;
                 }
                 const part = json.candidates?.[0]?.content?.parts?.[0]?.text;

@@ -11,9 +11,11 @@ import { Switch } from 'antd'
 
 
 interface Message {
-  content: string;
+  content: string | null;
   isUser: boolean;
   isSearching?: boolean;
+  functionCall: JSON | null;
+  functionResponse: JSON | null;
 }
 
 const styles = {
@@ -161,7 +163,7 @@ const MessageBubble = ({ content, isUser, isSearching }: Message) => {
           ),
         }}
       >
-        {content.trim()}
+        {content?.trim()}
       </ReactMarkdown>
     </div>
   );
@@ -214,12 +216,24 @@ const ChatContainer = ({
       const isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 10;
       setIsScrolledUp(!isAtBottom);
     }}>
-      {messages.map((msg, idx) => (
-        <MessageBubble key={idx} {...msg} />
-      ))}
-      {liveMessage?.content && <MessageBubble {...liveMessage} 
-      />}
-      <div ref={bottomRef} />
+      <MessageBubble
+        content="Xin chào, tôi là Unibot - chuyên gia tư vấn tuyển sinh đại học và kỳ thi THPT quốc gia, tôi có thể giúp gì cho bạn?"
+        isUser={false}
+        isSearching={false}
+        functionCall={null}
+        functionResponse={null}
+      />
+      {messages.map((msg, idx) => {
+        const isLast = idx === messages.length - 1;
+        if (msg.content !== null || (msg.isSearching && isLast)) {
+          return <MessageBubble key={idx} {...msg} />;
+        }
+        return null;
+      })}
+      {liveMessage?.content !== null && liveMessage && (
+        <MessageBubble {...liveMessage} />
+      )}
+  <div ref={bottomRef} />
     </div>
   );
 };
@@ -234,7 +248,7 @@ export default function ChatbotWidget() {
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [includeMajorCompare, setIncludeMajorCompare] = useState(true);
+  const [includeMajorCompare, setIncludeMajorCompare] = useState(false);
 
 
   const streamChat = useChatbot(
@@ -242,17 +256,23 @@ export default function ChatbotWidget() {
       setLiveMessage((prev) => ({
         content: (prev?.content || "") + text,
         isUser: false,
+        functionCall: null,
+        functionResponse: null,
       }));
     },
     (name: string, args: any) => {
       console.log(`Function call: ${name}`, args);
       if (name === "search_google") {
         setIsSearching(true);
-        setMessages((prev) => [...prev, { 
-          content: args, 
-          isUser: false,
-          isSearching: true
-        }]);
+        setMessages((prev) => {
+          return [...prev, { 
+            content: null, 
+            isUser: false,
+            isSearching: true,
+            functionCall: JSON.parse(JSON.stringify({ name, args })),
+            functionResponse: null,
+          }];
+        });
         hasAppended.current = false;
       }
     },
@@ -261,11 +281,13 @@ export default function ChatbotWidget() {
       if (name === "search_google") {
         setIsSearching(false);
         const botMsg = {
-          content: response,
+          content: null,
           isUser: false,
-          isSearching: false
+          isSearching: false,
+          functionCall: null,
+          functionResponse: JSON.parse(JSON.stringify({ name, response })),
         };
-        setMessages((prev) => [...prev.filter(msg => !msg.isSearching), botMsg]);
+        setMessages((prev) => [...prev, botMsg]);
         hasAppended.current = false;
       }
     },
@@ -283,7 +305,7 @@ export default function ChatbotWidget() {
     () => {
       setMessages((prev) => [
         ...prev,
-        { content: "Server lỗi", isUser: false },
+        { content: "Server lỗi", isUser: false, functionCall: null, functionResponse: null },
       ]);
       setLiveMessage(null);
       setIsSearching(false);
@@ -297,26 +319,13 @@ export default function ChatbotWidget() {
 
   let fullPrompt = message;
 
-  const isComparisonQuestion = /so sánh|compare|khác nhau|khác biệt/i.test(message);
-
     if (includeMajorCompare) {
-      if (Object.keys(majorCompareCache).length === 0 && isComparisonQuestion) {
-        setMessages((prev) => [
-          ...prev,
-          { content: message, isUser: true },
-          {
-            content: "Hiện tại không có thông tin về các ngành so sánh. Vui lòng thêm ngành để so sánh trước.",
-            isUser: false,
-          },
-        ]);
-        setMessage("");
-        return;
-      }
+
       fullPrompt = `${message}\n\n${formatMajorCompareCache()}`;
     }
 
-    const displayUserMsg = { content: message, isUser: true };
-    const aiInput = { content: fullPrompt, isUser: true };
+    const displayUserMsg = { content: message, isUser: true, functionCall: null, functionResponse: null };
+    const aiInput = { content: fullPrompt, isUser: true, functionCall: null, functionResponse: null };
 
     const updatedMessages = [...messages, displayUserMsg];
     setMessages(updatedMessages);
@@ -372,7 +381,7 @@ export default function ChatbotWidget() {
                 style={{
                   position: "absolute",
                   right: 30,
-                  bottom: 150,
+                  bottom: 105,
                   width: 32,
                   height: 32,
                   boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
