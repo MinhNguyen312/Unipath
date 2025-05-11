@@ -3,7 +3,8 @@ export function useChatbot(
   onFunctionCall: (name: string, args: any) => void,
   onFunctionResponse: (name: string, response: any) => void,
   onDone: () => void,
-  onError: () => void
+  onError: () => void,
+  onRateLimitError?: () => void
 ) {
   return async (messages: { content: string | null; isUser: boolean; functionCall: JSON | null; functionResponse: JSON | null }[]) => {
     try {
@@ -35,6 +36,11 @@ export function useChatbot(
           contents: formattedMessages,
         }),
       });
+
+      if (res.status === 429) {
+        if (onRateLimitError) onRateLimitError();
+        return;
+      }
 
       if (!res.body) throw new Error("No response body");
 

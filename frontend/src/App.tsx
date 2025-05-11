@@ -10,6 +10,7 @@ import Analysis from './pages/Analysis'
 import AppFooter from './components/AppFooter'
 import ChatbotWidget from './components/Chatbot/ChatbotWidget'
 
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
