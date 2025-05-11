@@ -1,0 +1,13 @@
+global:
+  resolve_timeout: 5m
+  http_config: 
+    proxy_from_environment: true
+
+route:
+  receiver: discord
+
+receivers:
+  - name: discord
+    discord_configs:
+      - webhook_url: 'https://discord.com/api/webhooks/1357579683419656333/4O-iwJciV6lKek9_bZQnZUMiQ6-1JTs5nwBdgyKroL-r_GmKxItauARKOtZXmv7H7K21'
+        send_resolved: true

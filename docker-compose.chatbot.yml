@@ -1,0 +1,133 @@
+networks:
+  chatbot:
+    driver: bridge
+
+services:
+  chatbot-be:
+    build:
+      context: ./chatbot/server
+    image: chatbot-be:1
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    environment:
+      - REDIS_LIMITER_URL=redis://redis:6379/1
+      - REDIS_CACHE_URL=redis://redis:6379/0
+      - CHATBOT_MCP_URL=http://chatbot-mcp:8001
+      - CHATBOT_TRACE_URL=http://trace-server:8002
+    env_file:
+      - ./chatbot/server/.env
+    command: python3 server.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      - chatbot-mcp
+      - redis
+    networks:
+      - chatbot
+
+  chatbot-mcp:
+    build:
+      context: ./chatbot/server
+    image: chatbot-be:1
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+    env_file:
+      - ./chatbot/server/.env
+    command: python3 mcp_server.py
+    networks:
+      - chatbot
+
+  trace-server:
+    image: ntkhang2003/chatbot-trace:1
+    ports:
+      - "8002:8002"
+      - "8090:8090" # Prometheus
+    restart: unless-stopped
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/2
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    env_file:
+      - ./chatbot/server/.env
+    command: python3 server.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      - redis
+      - trace-worker
+    networks:
+      - chatbot
+
+  trace-worker:
+    image: ntkhang2003/chatbot-trace:1
+    restart: unless-stopped
+    environment:
+      - CHATBOT_TRACE_URL=http://trace-server:8002
+      - CELERY_BROKER_URL=redis://redis:6379/2
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    env_file:
+      - ./chatbot/server/.env
+    command: celery -A tasks worker --loglevel=info -P gevent
+    depends_on:
+      - redis
+    networks:
+      - chatbot
+  
+  prometheus:
+    image: prom/prometheus:v3.3.1
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/config/alert-rules.yml:/etc/prometheus/alert-rules.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=20h'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks:
+      - chatbot
+  
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/config/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - "9093:9093"
+    networks:
+      - chatbot
+
+  redis:
+    image: redis:8
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+    networks:
+      - chatbot
+
+volumes:
+  prometheus_data:
+  redis_data:

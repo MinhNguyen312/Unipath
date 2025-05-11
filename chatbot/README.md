@@ -1,34 +1,42 @@
-## API endpoint for Gemini API call
+# API endpoint for Gemini API call with MCP and tracing service
 
-### Installation
+## Installation
 
-Copy `env.example` file to `.env` file and fill in the Gemini API Key.
+Copy `env.example` file to `.env` file and fill in the Gemini API and Langfuse Key.
 
-#### Run in dev env
+### Run in dev env
 
+#### Run chatbot backend server
 ```bash
+cd ./chatbot/server
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn server:app --host 0.0.0.0 --port 8000
+python3 mcp-server.py
+python3 server.py
 ```
 
-#### Run with docker
+#### Run chatbot tracing
+```bash
+cd ./chatbot/trace
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+celery -A tasks worker --loglevel=info -P gevent
+python3 server.py
+```
 
-Build image and run container
+### Run with docker
+
+Run with docker compose
 
 ```bash
-docker build -t chatbot-be .
-docker run -d -p 8000:8000 --env-file .env chatbot-be
+docker compose -f docker-compose.chatbot.yml up -d --build
 ```
 
-Or run with docker compose
+### Usage
 
-```bash
-docker compose up -d --build
-```
-
-Check server running
+Check server health
 
 http://localhost:8000/health
 
