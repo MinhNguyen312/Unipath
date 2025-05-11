@@ -5,7 +5,18 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:5173" }));
+const allowedOrigins = ["http://localhost:5173", "http://localhost"];
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
 const routes = require("./routes");
 app.use("/api", routes);
 

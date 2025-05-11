@@ -12,6 +12,7 @@ import ChatbotWidget from './components/Chatbot/ChatbotWidget'
 import FindSchool from './pages/FindSchool'
 import { useEffect } from 'react';
 
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

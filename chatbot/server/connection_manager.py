@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import AsyncExitStack
 from mcp import ClientSession, StdioServerParameters
-from mScp.client.sse import sse_client
+from mcp.client.sse import sse_client
 
 class ConnectionManager:
     def __init__(self, sse_server_map):
@@ -46,20 +46,22 @@ class ConnectionManager:
         await self.exit_stack.aclose()
 
 
-if __name__ == "__main__":
-    sse_server_map = {
-        "python_executor_mcp": "http://localhost:8001/sse",
-    }
+# if __name__ == "__main__":
+#     sse_server_map = {
+#         "python_executor_mcp": "http://localhost:8001/sse",
+#     }
 
-    async def main():
-        connection_manager = ConnectionManager(sse_server_map)
-        await connection_manager.initialize()
+#     async def main():
+#         connection_manager = ConnectionManager(sse_server_map)
+#         await connection_manager.initialize()
 
-        tool_map, tool_objects = await connection_manager.list_tools()
+#         tool_map, tool_objects = await connection_manager.list_tools()
 
-        print(tool_map)
-        print(tool_objects)
+#         print(tool_map)
+#         print(tool_objects)
 
-        await connection_manager.close()
+#         tool_result = await connection_manager.call_tool("search_google", {"query": "đại học lạc hồng"}, tool_map)
+#         print(tool_result)
+#         await connection_manager.close()
 
-    asyncio.run(main())
+#     asyncio.run(main())

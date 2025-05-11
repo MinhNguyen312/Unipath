@@ -3,14 +3,29 @@ export function useChatbot(
   onFunctionCall: (name: string, args: any) => void,
   onFunctionResponse: (name: string, response: any) => void,
   onDone: () => void,
-  onError: () => void
+  onError: () => void,
+  onRateLimitError?: () => void
 ) {
-  return async (messages: { content: string; isUser: boolean }[]) => {
+  return async (messages: { content: string | null; isUser: boolean; functionCall: JSON | null; functionResponse: JSON | null }[]) => {
     try {
-      const formattedMessages = messages.map((msg) => ({
-        role: msg.isUser ? "user" : "model",
-        parts: [{ text: msg.content }],
-      }));
+      const formattedMessages = messages.map((msg) => {
+        let role = msg.isUser ? "user" : "model";
+        let parts: { text?: string; functionCall?: JSON; functionResponse?: JSON }[] = [];
+        
+        if (msg.content && msg.content.trim() !== "") {
+          parts = [{ text: msg.content }];
+        } else if (msg.functionCall) {
+          parts = [{ functionCall: msg.functionCall }];
+        } else if (msg.functionResponse) {
+          role = "user";
+          parts = [{ functionResponse: msg.functionResponse }];
+        }
+  
+        return {
+          role,
+          parts,
+        };
+      });
 
       const res = await fetch(`${import.meta.env.VITE_CHATBOT_URL}/stream`, {
         method: "POST",
@@ -21,6 +36,11 @@ export function useChatbot(
           contents: formattedMessages,
         }),
       });
+
+      if (res.status === 429) {
+        if (onRateLimitError) onRateLimitError();
+        return;
+      }
 
       if (!res.body) throw new Error("No response body");
 

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Button, Input, ConfigProvider } from "antd";
+import { Button, Input, ConfigProvider, Alert } from "antd";
 import { MessageOutlined, CloseOutlined, ReloadOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useChatbot } from "../../hooks/useChatbot";
 import ReactMarkdown from "react-markdown";
@@ -11,9 +11,11 @@ import { Switch } from 'antd'
 
 
 interface Message {
-  content: string;
+  content: string | null;
   isUser: boolean;
   isSearching?: boolean;
+  functionCall: JSON | null;
+  functionResponse: JSON | null;
 }
 
 const styles = {
@@ -79,7 +81,57 @@ const styles = {
     alignSelf: "flex-start" as const,
     color: "#333",
     fontSize: 14,
-  }
+  },
+  errorPopup: {
+    position: "fixed" as const,
+    bottom: 180,
+    right: 110,
+    backgroundColor: "#fff1f0",
+    border: "1px solid #ffa39e",
+    color: "#cf1322",
+    padding: "10px",
+    borderRadius: 8,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+    zIndex: 2000,
+    textAlign: "center" as const,
+    maxWidth: 300,
+    width: "calc(100vw - 48px)",
+  },
+  errorCloseButton: {
+    marginTop: 10,
+    backgroundColor: "#cf1322",
+    color: "white",
+    border: "none",
+    padding: "4px 12px",
+    borderRadius: 4,
+    cursor: "pointer" as const,
+  },
+};
+
+const ErrorPopup = ({ message, onClose }: { message: string; onClose: () => void }) => {
+  useEffect(() => {
+    console.log("ErrorPopup displayed, starting 5-second timer");
+    const timer = setTimeout(() => {
+      console.log("Auto-closing ErrorPopup after 5 seconds");
+      onClose();
+    }, 5000); // 5 giây
+
+    return () => {
+      console.log("Cleaning up ErrorPopup timer");
+      clearTimeout(timer);
+    };
+  }, [onClose]);
+
+  return (
+      <Alert
+        message={message}
+        type="error"
+        showIcon
+        closable
+        onClose={onClose}
+        style={styles.errorPopup}
+    />
+  );
 };
 
 const formatMajorCompareCache = (): string => {
@@ -161,7 +213,7 @@ const MessageBubble = ({ content, isUser, isSearching }: Message) => {
           ),
         }}
       >
-        {content.trim()}
+        {content?.trim()}
       </ReactMarkdown>
     </div>
   );
@@ -214,12 +266,24 @@ const ChatContainer = ({
       const isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 10;
       setIsScrolledUp(!isAtBottom);
     }}>
-      {messages.map((msg, idx) => (
-        <MessageBubble key={idx} {...msg} />
-      ))}
-      {liveMessage?.content && <MessageBubble {...liveMessage} 
-      />}
-      <div ref={bottomRef} />
+      <MessageBubble
+        content="Xin chào, tôi là Unibot - chuyên gia tư vấn tuyển sinh đại học và kỳ thi THPT quốc gia, tôi có thể giúp gì cho bạn?"
+        isUser={false}
+        isSearching={false}
+        functionCall={null}
+        functionResponse={null}
+      />
+      {messages.map((msg, idx) => {
+        const isLast = idx === messages.length - 1;
+        if (msg.content !== null || (msg.isSearching && isLast)) {
+          return <MessageBubble key={idx} {...msg} />;
+        }
+        return null;
+      })}
+      {liveMessage?.content !== null && liveMessage && (
+        <MessageBubble {...liveMessage} />
+      )}
+  <div ref={bottomRef} />
     </div>
   );
 };
@@ -234,7 +298,8 @@ export default function ChatbotWidget() {
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [includeMajorCompare, setIncludeMajorCompare] = useState(true);
+  const [includeMajorCompare, setIncludeMajorCompare] = useState(false);
+  const [showError, setShowError] = useState(false);
 
 
   const streamChat = useChatbot(
@@ -242,26 +307,39 @@ export default function ChatbotWidget() {
       setLiveMessage((prev) => ({
         content: (prev?.content || "") + text,
         isUser: false,
+        functionCall: null,
+        functionResponse: null,
       }));
     },
     (name: string, args: any) => {
       console.log(`Function call: ${name}`, args);
-      
       if (name === "search_google") {
         setIsSearching(true);
-        setMessages((prev) => [...prev, { 
-          content: "", 
-          isUser: false,
-          isSearching: true
-        }]);
+        setMessages((prev) => {
+          return [...prev, { 
+            content: null, 
+            isUser: false,
+            isSearching: true,
+            functionCall: JSON.parse(JSON.stringify({ name, args })),
+            functionResponse: null,
+          }];
+        });
+        hasAppended.current = false;
       }
     },
     (name: string, response: any) => {
       console.log(`Function response: ${name}`, response);
-      
       if (name === "search_google") {
         setIsSearching(false);
-        setMessages((prev) => prev.filter(msg => !msg.isSearching));
+        const botMsg = {
+          content: null,
+          isUser: false,
+          isSearching: false,
+          functionCall: null,
+          functionResponse: JSON.parse(JSON.stringify({ name, response })),
+        };
+        setMessages((prev) => [...prev, botMsg]);
+        hasAppended.current = false;
       }
     },
     () => {
@@ -271,42 +349,42 @@ export default function ChatbotWidget() {
           hasAppended.current = true;
         }
         setIsComposing(false);
+        setIsSearching(false);
         return null;
       });
     },
     () => {
       setMessages((prev) => [
         ...prev,
-        { content: "Server lỗi", isUser: false },
+        { content: "Server lỗi", isUser: false, functionCall: null, functionResponse: null },
       ]);
       setLiveMessage(null);
+      setIsSearching(false);
+      setIsComposing(false);
+    },
+    () => {
+      console.log("onRateLimitError called: Error 429 detected");
+      setShowError(true); // Hiển thị thông báo lỗi
+      console.log("Error popup triggered for 429 error");
+      setIsSearching(false);
+      setIsComposing(false);
+      console.log("Reset isSearching and isComposing after 429 error");
     }
   );
 
   const handleSend = () => {
-    setIsComposing(true);
+  setIsComposing(true);
   if (!message.trim()) return;
 
   let fullPrompt = message;
 
     if (includeMajorCompare) {
-      if (Object.keys(majorCompareCache).length === 0) {
-        setMessages((prev) => [
-          ...prev,
-          { content: message, isUser: true },
-          {
-            content: "Hiện tại không có thông tin về các ngành so sánh. Vui lòng thêm ngành để so sánh trước.",
-            isUser: false,
-          },
-        ]);
-        setMessage("");
-        return;
-      }
+
       fullPrompt = `${message}\n\n${formatMajorCompareCache()}`;
     }
 
-    const displayUserMsg = { content: message, isUser: true };
-    const aiInput = { content: fullPrompt, isUser: true };
+    const displayUserMsg = { content: message, isUser: true, functionCall: null, functionResponse: null };
+    const aiInput = { content: fullPrompt, isUser: true, functionCall: null, functionResponse: null };
 
     const updatedMessages = [...messages, displayUserMsg];
     setMessages(updatedMessages);
@@ -322,6 +400,11 @@ export default function ChatbotWidget() {
     setLiveMessage(null);
     setMessage("");
     hasAppended.current = false;
+  };
+
+  const handleCloseError = () => {
+    setShowError(false);
+    console.log("Error popup closed manually");
   };
 
   return (
@@ -362,7 +445,7 @@ export default function ChatbotWidget() {
                 style={{
                   position: "absolute",
                   right: 30,
-                  bottom: 150,
+                  bottom: 105,
                   width: 32,
                   height: 32,
                   boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
@@ -421,6 +504,12 @@ export default function ChatbotWidget() {
             </div>
           </div>
         </div>
+      )}
+      {showError && (
+        <ErrorPopup
+          message="Vui lòng thử lại sau!"
+          onClose={handleCloseError}
+        />
       )}
     </ConfigProvider>
   );
