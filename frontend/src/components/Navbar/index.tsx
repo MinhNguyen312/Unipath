@@ -3,6 +3,7 @@ import { Layout, Affix, Menu, Typography} from 'antd';
 import { HomeOutlined, BarChartOutlined, SearchOutlined } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+
 import './styles.css';
 
 const { Header } = Layout;
@@ -73,7 +74,7 @@ const Navbar: React.FC = () => {
           }}
         >
           <div className="logo" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="public/Unipath-logo.svg" alt="Logo" style={{ width: 40, height: 40, marginRight: 10 }} />
+            <img src="/Unipath-logo.svg" alt="Logo" style={{ width: 40, height: 40, marginRight: 10 }} />
             <Typography.Title
               level={isMobile ? 5 : 4}
               style={{

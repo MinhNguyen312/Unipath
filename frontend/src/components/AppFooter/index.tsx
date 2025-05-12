@@ -16,16 +16,7 @@ const AppFooter: React.FC = () => {
             <Row gutter={[48, 32]}>
               <Col xs={24} md={8}>
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-                  <div style={{ 
-                    width: 40, 
-                    height: 40, 
-                    backgroundColor: '#10B981', 
-                    borderRadius: '50%',
-                    marginRight: 10,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}></div>
+                <img src="/Unipath-logo-white.svg" alt="Logo" style={{ width: 40, height: 40, marginRight: 10 }} />
                   <Typography.Title level={4} style={{ margin: 0, color: '#fff' }}>
                     Unipath
                   </Typography.Title>

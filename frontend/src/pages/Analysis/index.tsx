@@ -1,7 +1,6 @@
 import React from 'react';
 import { Layout } from 'antd';
 import './styles.css';
-import SchoolCompare from '../../components/SchoolCompare/SchoolCompare';
 const { Content } = Layout;
 import TableauEmbed from '../../components/Tableau/TableauEmbed';
 import { Card } from 'antd';
