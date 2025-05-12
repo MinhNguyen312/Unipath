@@ -356,7 +356,7 @@ export default function ChatbotWidget() {
     () => {
       setMessages((prev) => [
         ...prev,
-        { content: "Server lỗi", isUser: false, functionCall: null, functionResponse: null },
+        { content: "Hiện tại tôi không thể trả lời, hãy thử lại!", isUser: false, functionCall: null, functionResponse: null },
       ]);
       setLiveMessage(null);
       setIsSearching(false);
