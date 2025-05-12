@@ -188,7 +188,7 @@ async def stream(request_body: GenerationRequest):
                             )
                             
                             yield f"data: {json.dumps({'functionCall': function_call}, ensure_ascii=False)}\n\n"
-                            yield "data: [DONE]\n\n"
+
                             # Ngắt stream -> Gọi tool
 
                             tool_output_span = trace.span(
