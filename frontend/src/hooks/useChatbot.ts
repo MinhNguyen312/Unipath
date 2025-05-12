@@ -64,16 +64,11 @@ export function useChatbot(
             if (trimmedLine.startsWith("data: ")) {
               const data = trimmedLine.replace(/^data: /, "");
 
-              if (data.trim() === "[DONE]") {
-                console.log("yeah");
-                shouldStop = true;
-                continue;
-              }
-
               try {
                 const json = JSON.parse(data);
                 if (json.functionCall) {
                   onFunctionCall(json.functionCall.name, json.functionCall.args);
+                  shouldStop = true
                   continue;
                 }
                 if (json.functionResponse) {
