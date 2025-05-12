@@ -63,7 +63,7 @@ async def lifespan(app: FastAPI):
         vectorizer=geminiVectorizer,
         ttl=360,
         redis_url=os.getenv("REDIS_CACHE_URL"),
-        distance_threshold=0.1
+        distance_threshold=0.05
     )
     app.state.llmcache = llmcache
 
@@ -171,112 +171,110 @@ async def stream(request_body: GenerationRequest):
                     if line.startswith("data: "):
                         data = line.removeprefix("data: ").strip()
 
-                        if data == "[DONE]":
-                            break
-
-                        # Kiểm tra function call
-                        function_call = parse_function_call(data)
-                        
-                        if function_call:
-                            data = json.loads(data)
-                            tool_calling_span.end(
-                                output=data["candidates"][0]["content"],
-                                usage_details={
-                                    "input": data["usageMetadata"]["promptTokenCount"],
-                                    "output": data["usageMetadata"]["candidatesTokenCount"]
-                                }
-                            )
+                        if data != "[DONE]":
                             
-                            yield f"data: {json.dumps({'functionCall': function_call}, ensure_ascii=False)}\n\n"
-
-                            # Ngắt stream -> Gọi tool
-
-                            tool_output_span = trace.span(
-                                name="tools-output",
-                                input={"tool_calls": function_call}
-                            )
-
-                            tool_result = await app.state.conn_manager.call_tool(function_call['name'], function_call['args'], app.state.tool_map)
-
-                            tool_output_span.end(output={"tools_output": tool_result})
-
-                            yield f"data: {json.dumps({'functionResponse': {'name': function_call['name'], 'response': {'result': tool_result}}}, ensure_ascii=False)}\n\n"
-
-                            # Gửi lại kết quả tool cho model để generate response
-                            request_body_dict.pop("tools", None)
-                            request_body_dict["contents"].append({
-                                "role": "model",
-                                "parts": [
-                                    {
-                                        "functionCall": function_call
+                            # Kiểm tra function call
+                            function_call = parse_function_call(data)
+                            
+                            if function_call:
+                                data = json.loads(data)
+                                tool_calling_span.end(
+                                    output=data["candidates"][0]["content"],
+                                    usage_details={
+                                        "input": data["usageMetadata"]["promptTokenCount"],
+                                        "output": data["usageMetadata"]["candidatesTokenCount"]
                                     }
-                                ]
-                            })
-                            request_body_dict["contents"].append({
-                                "role": "user",
-                                "parts": [
-                                    {
-                                        "functionResponse": {"name": function_call["name"], "response": {"result": tool_result}} 
-                                    }
-                                ]
-                            })
-
-                            buffer_ = []
-                            llm_span = trace.generation(
-                                name="llm-response",
-                                model="gemini-2.0-flash-001",
-                                input=request_body_dict["contents"]
-                            )
-
-                            async with client.stream("POST", STREAM_URL, headers=HEADERS, json=request_body_dict) as response:
-                                if response.status_code != 200:
-                                    error_msg = await response.aread()
-                                    yield f"data: {error_msg.decode()}\n\n"
-                                    return
+                                )
                                 
-                                async for line in response.aiter_lines():
-                                    if line.startswith("data: "):
-                                        data = line.removeprefix("data: ").strip()
-                                        if data != "[DONE]":
-                                            data_ = json.loads(data)
-                                            
-                                            buffer_.append(data_["candidates"][0]["content"]["parts"][0]["text"])
-                                            yield f"data: {data}\n\n"
-                            
-                            response_text = "".join(buffer_)
-                            llm_span.end(
-                                output={
+                                yield f"data: {json.dumps({'functionCall': function_call}, ensure_ascii=False)}\n\n"
+
+                                # Ngắt stream -> Gọi tool
+
+                                tool_output_span = trace.span(
+                                    name="tools-output",
+                                    input={"tool_calls": function_call}
+                                )
+
+                                tool_result = await app.state.conn_manager.call_tool(function_call['name'], function_call['args'], app.state.tool_map)
+
+                                tool_output_span.end(output={"tools_output": tool_result})
+
+                                yield f"data: {json.dumps({'functionResponse': {'name': function_call['name'], 'response': {'result': tool_result}}}, ensure_ascii=False)}\n\n"
+
+                                # Gửi lại kết quả tool cho model để generate response
+                                request_body_dict.pop("tools", None)
+                                request_body_dict["contents"].append({
                                     "role": "model",
-                                    "parts": [{ "text": response_text }]
-                                },
-                                usage_details={
-                                    "input": data_["usageMetadata"]["promptTokenCount"],
-                                    "output": data_["usageMetadata"]["candidatesTokenCount"]
-                                }
-                            )
-                            trace.update(name='tools-call', output=response_text)
+                                    "parts": [
+                                        {
+                                            "functionCall": function_call
+                                        }
+                                    ]
+                                })
+                                request_body_dict["contents"].append({
+                                    "role": "user",
+                                    "parts": [
+                                        {
+                                            "functionResponse": {"name": function_call["name"], "response": {"result": tool_result}} 
+                                        }
+                                    ]
+                                })
 
-                            # Request API để tính toán metrics cho chatbot
-                            requests.post(f"{os.getenv('CHATBOT_TRACE_URL')}/calculate-metrics", json={
-                                "request": request_prompt,
-                                "response": response_text,
-                                "trace_id": trace.id
-                            })
+                                buffer_ = []
+                                llm_span = trace.generation(
+                                    name="llm-response",
+                                    model="gemini-2.0-flash-001",
+                                    input=request_body_dict["contents"]
+                                )
 
-                            # Lưu câu trả lời vào cache
-                            await app.state.llmcache.store(
-                                prompt=request_prompt,
-                                response=response_text
-                            )
+                                async with client.stream("POST", STREAM_URL, headers=HEADERS, json=request_body_dict) as response:
+                                    if response.status_code != 200:
+                                        error_msg = await response.aread()
+                                        yield f"data: {error_msg.decode()}\n\n"
+                                        return
+                                    
+                                    async for line in response.aiter_lines():
+                                        if line.startswith("data: "):
+                                            data = line.removeprefix("data: ").strip()
+                                            if data != "[DONE]":
+                                                data_ = json.loads(data)
+                                                
+                                                buffer_.append(data_["candidates"][0]["content"]["parts"][0]["text"])
+                                                yield f"data: {data}\n\n"
+                                                
+                                response_text = "".join(buffer_)
+                                llm_span.end(
+                                    output={
+                                        "role": "model",
+                                        "parts": [{ "text": response_text }]
+                                    },
+                                    usage_details={
+                                        "input": data_["usageMetadata"]["promptTokenCount"],
+                                        "output": data_["usageMetadata"]["candidatesTokenCount"]
+                                    }
+                                )
+                                trace.update(name='tools-call', output=response_text)
 
-                            return
+                                # Request API để tính toán metrics cho chatbot
+                                requests.post(f"{os.getenv('CHATBOT_TRACE_URL')}/calculate-metrics", json={
+                                    "request": request_prompt,
+                                    "response": response_text,
+                                    "trace_id": trace.id
+                                })
 
-                        else:
-                            # Nếu không phải tool, stream bình thường
-                            data_ = json.loads(data)
-                                            
-                            buffer.append(data_["candidates"][0]["content"]["parts"][0]["text"])
-                            yield f"data: {data}\n\n"
+                                # Lưu câu trả lời vào cache
+                                await app.state.llmcache.store(
+                                    prompt=request_prompt,
+                                    response=response_text
+                                )
+                                return
+
+                            else:
+                                # Nếu không phải tool, stream bình thường
+                                data_ = json.loads(data)               
+                                buffer.append(data_["candidates"][0]["content"]["parts"][0]["text"])
+
+                                yield f"data: {data}\n\n"
 
             response_text = "".join(buffer)
             data = json.loads(data)
