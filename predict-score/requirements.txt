@@ -3,3 +3,5 @@ xgboost
 pandas
 numpy
 gdown
+mlflow
+seaborn
