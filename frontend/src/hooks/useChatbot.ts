@@ -7,6 +7,7 @@ export function useChatbot(
   onRateLimitError?: () => void
 ) {
   return async (messages: { content: string | null; isUser: boolean; functionCall: JSON | null; functionResponse: JSON | null }[]) => {
+    let shouldStop;
     try {
       const formattedMessages = messages.map((msg) => {
         let role = msg.isUser ? "user" : "model";
@@ -63,6 +64,12 @@ export function useChatbot(
             if (trimmedLine.startsWith("data: ")) {
               const data = trimmedLine.replace(/^data: /, "");
 
+              if (data.trim() === "[DONE]") {
+                console.log("yeah");
+                shouldStop = true;
+                continue;
+              }
+
               try {
                 const json = JSON.parse(data);
                 if (json.functionCall) {
@@ -90,7 +97,11 @@ export function useChatbot(
       onDone();
     } catch (error) {
       console.error("Streaming error:", error);
-      onError();
+      if (shouldStop) {
+        onDone();
+      } else {
+        onError();
+      }
     }
   };
 }
