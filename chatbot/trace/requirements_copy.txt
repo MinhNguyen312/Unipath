@@ -1,0 +1,13 @@
+opentelemetry-api==1.31.1
+opentelemetry-sdk==1.31.1
+opentelemetry-exporter-prometheus==0.52b1
+prometheus_client==0.21.1
+litellm==1.65.3
+celery==5.5.0
+redis==5.2.1
+gevent==24.11.1
+evidently[llm]==0.6.7
+numpy==2.0.2
+langfuse==2.60.2
+fastapi==0.115.12
+uvicorn==0.34.0

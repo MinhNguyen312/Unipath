@@ -1,0 +1,10 @@
+requests
+fastapi
+fastapi-limiter
+uvicorn
+python-dotenv
+mcp[cli]
+duckduckgo-search
+langfuse
+aioredis
+redisvl
