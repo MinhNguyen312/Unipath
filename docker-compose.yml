@@ -28,6 +28,8 @@ services:
       - DB_USER=root
       - DB_PASSWORD=password
       - DB_NAME=unipath
+      - REDIS_URL=redis://redis-unipath:6379
+
     depends_on:
       mysql-unipath:
         condition: service_healthy
@@ -184,6 +186,17 @@ services:
       retries: 5
     networks:
       - chatbot
+
+  redis-unipath:
+    image: redis:7-alpine
+    container_name: redis-unipath
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - unipath-network
 
 networks:
   unipath-network:

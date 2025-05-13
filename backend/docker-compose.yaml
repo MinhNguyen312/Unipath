@@ -12,6 +12,7 @@ services:
       - DB_USER=root
       - DB_PASSWORD=password
       - DB_NAME=unipath
+      - REDIS_URL=redis://redis-unipath:6379
     depends_on:
       mysql:
         condition: service_healthy
@@ -38,7 +39,15 @@ services:
       timeout: 5s
       retries: 10
 
-
+  redis-be:
+    image: redis:7
+    container_name: redis-unipath
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
 
 volumes:
   mysql_data:
+  redis_data:
