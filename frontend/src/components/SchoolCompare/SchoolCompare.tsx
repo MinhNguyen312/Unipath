@@ -127,9 +127,21 @@ export default function SchoolComparison() {
     {
       key: "4",
       info: <strong style={{ color: "#2e7d32" }}>Điểm chuẩn</strong>,
-      school0: scoreChart1 ? <ScoreChart data={scoreChart1} /> : "-",
-      school1: scoreChart2 ? <ScoreChart data={scoreChart2} /> : "-",
-      school2: scoreChart3 ? <ScoreChart data={scoreChart3} /> : "-",
+      school0: scoreChart1 ? (
+        <div style={{ width: 300, height: 150 }}>
+          <ScoreChart data={scoreChart1} />
+        </div>
+      ) : "-",
+      school1: scoreChart2 ? (
+        <div style={{ width: 300, height: 150 }}>
+          <ScoreChart data={scoreChart2} />
+        </div>
+      ) : "-",
+      school2: scoreChart3 ? (
+        <div style={{ width: 300, height: 150 }}>
+          <ScoreChart data={scoreChart3} />
+        </div>
+      ) : "-",
     }
   ]
 
@@ -156,18 +168,27 @@ export default function SchoolComparison() {
     >
       <div className="w-full max-w-4xl mx-auto space-y-6">
         <div>
-          <Title level={4} style={{ color: "#2e7d32", marginBottom: "8px" }}>
+          <Title level={3} style={{ color: "#2e7d32", marginBottom: "8px" }}>
             So sánh điểm của ngành
           </Title>
+          
+          <div style={{ paddingTop:"10px"}}>
+              <label style={{ fontSize: "18px", fontWeight: "bold", color: "#2e7d32" }}>
+               <span style={{ fontSize:"16px", color: "#ff4f51", fontWeight: "lighter" }}>*</span> Ngành học
+              </label>
+            
+              <div style={{ marginTop:"8px"}}>
+                <AutoSuggestInput
+                  placeholder="Nhập tên ngành..."
+                  onSelect={(value) => {
+                    setSelectedMajor(value);
+                    setSchools(["", "", ""]);
+                    setShowTable(false);
+                  }}
+                />
+              </div>
+          </div>
 
-          <AutoSuggestInput
-            placeholder="Nhập tên ngành..."
-            onSelect={(value) => {
-              setSelectedMajor(value)
-              setSchools(["", "", ""])
-              setShowTable(false)
-            }}
-          />
 
           {selectedMajor && (
             <div style={{ marginTop: "16px", color: "rgba(0, 0, 0, 0.45)", fontSize: "14px" }}>
@@ -176,35 +197,38 @@ export default function SchoolComparison() {
           )}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px" }}>
+        <div className="school-selectors" style={{marginTop: "20px"}}>
           {[0, 1, 2].map((index) => (
             <div key={index} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <label style={{ fontSize: "18px", fontWeight: "bold", color: "#2e7d32" }}>Trường</label>
+              <label style={{ fontSize: "18px", fontWeight: "bold", color: "#2e7d32" }}>
+               {index === 0 && <span style={{ fontSize:"16px", color: "#ff4f51", fontWeight: "lighter" }}>*</span>} Trường
+              </label>
               <SchoolSelector
                 value={schools[index]}
                 onChange={(val) => handleSchoolChange(val, index)}
                 options={universityOptions}
                 disabled={isLoadingUniversities || !selectedMajor}
                 selectedValues={schools}
+                isRequired={index === 0? true : false}
               />
             </div>
           ))}
         </div>
 
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "24px" }}>
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "24px", paddingBottom: "24px" }}>
           <Button
             type="primary"
             size="large"
             onClick={handleSubmit}
             disabled={!selectedMajor || schools.every((school) => school === "")}
-            style={{ backgroundColor: "#1E894E", borderColor: "#2e7d32" }}
+            style={{ backgroundColor: "#1E894E", borderColor: "#2e7d32"}}
           >
             So sánh trường
           </Button>
         </div>
 
         {showTable && submittedSchools.length > 0 && (
-          <Card style={{ borderRadius: "12px", overflow: "hidden" }}>
+          <Card style={{ borderRadius: "12px", overflow: "hidden", paddingTop: "8px" }}>
             <Table
               columns={columns}
               dataSource={dataSource}
@@ -213,8 +237,10 @@ export default function SchoolComparison() {
               size="middle"
               scroll={{ x: "max-content" }}
               style={{ tableLayout: "fixed" }}
+              footer={() => 'Nguồn: VNExpress'}
             />
           </Card>
+          
         )}
 
         {showTable && submittedSchools.length === 0 && (
@@ -225,6 +251,7 @@ export default function SchoolComparison() {
           </Card>
         )}
       </div>
+      
     </ConfigProvider>
   )
 }

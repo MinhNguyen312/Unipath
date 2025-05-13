@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Button, Input, ConfigProvider } from "antd";
+import { Button, Input, ConfigProvider, Alert } from "antd";
 import { MessageOutlined, CloseOutlined, ReloadOutlined, DownOutlined, SearchOutlined } from "@ant-design/icons";
 import { useChatbot } from "../../hooks/useChatbot";
 import ReactMarkdown from "react-markdown";
@@ -81,7 +81,57 @@ const styles = {
     alignSelf: "flex-start" as const,
     color: "#333",
     fontSize: 14,
-  }
+  },
+  errorPopup: {
+    position: "fixed" as const,
+    bottom: 180,
+    right: 110,
+    backgroundColor: "#fff1f0",
+    border: "1px solid #ffa39e",
+    color: "#cf1322",
+    padding: "10px",
+    borderRadius: 8,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+    zIndex: 2000,
+    textAlign: "center" as const,
+    maxWidth: 300,
+    width: "calc(100vw - 48px)",
+  },
+  errorCloseButton: {
+    marginTop: 10,
+    backgroundColor: "#cf1322",
+    color: "white",
+    border: "none",
+    padding: "4px 12px",
+    borderRadius: 4,
+    cursor: "pointer" as const,
+  },
+};
+
+const ErrorPopup = ({ message, onClose }: { message: string; onClose: () => void }) => {
+  useEffect(() => {
+    console.log("ErrorPopup displayed, starting 5-second timer");
+    const timer = setTimeout(() => {
+      console.log("Auto-closing ErrorPopup after 5 seconds");
+      onClose();
+    }, 5000); // 5 giây
+
+    return () => {
+      console.log("Cleaning up ErrorPopup timer");
+      clearTimeout(timer);
+    };
+  }, [onClose]);
+
+  return (
+      <Alert
+        message={message}
+        type="error"
+        showIcon
+        closable
+        onClose={onClose}
+        style={styles.errorPopup}
+    />
+  );
 };
 
 const formatMajorCompareCache = (): string => {
@@ -249,6 +299,7 @@ export default function ChatbotWidget() {
   const [isComposing, setIsComposing] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [includeMajorCompare, setIncludeMajorCompare] = useState(false);
+  const [showError, setShowError] = useState(false);
 
 
   const streamChat = useChatbot(
@@ -305,11 +356,19 @@ export default function ChatbotWidget() {
     () => {
       setMessages((prev) => [
         ...prev,
-        { content: "Server lỗi", isUser: false, functionCall: null, functionResponse: null },
+        { content: "Hiện tại tôi không thể trả lời, hãy thử lại!", isUser: false, functionCall: null, functionResponse: null },
       ]);
       setLiveMessage(null);
       setIsSearching(false);
       setIsComposing(false);
+    },
+    () => {
+      console.log("onRateLimitError called: Error 429 detected");
+      setShowError(true); // Hiển thị thông báo lỗi
+      console.log("Error popup triggered for 429 error");
+      setIsSearching(false);
+      setIsComposing(false);
+      console.log("Reset isSearching and isComposing after 429 error");
     }
   );
 
@@ -341,6 +400,11 @@ export default function ChatbotWidget() {
     setLiveMessage(null);
     setMessage("");
     hasAppended.current = false;
+  };
+
+  const handleCloseError = () => {
+    setShowError(false);
+    console.log("Error popup closed manually");
   };
 
   return (
@@ -440,6 +504,12 @@ export default function ChatbotWidget() {
             </div>
           </div>
         </div>
+      )}
+      {showError && (
+        <ErrorPopup
+          message="Vui lòng thử lại sau!"
+          onClose={handleCloseError}
+        />
       )}
     </ConfigProvider>
   );
