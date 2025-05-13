@@ -137,4 +137,5 @@ dist
 
 # python
 .venv/
+__pycache__/
 .env
