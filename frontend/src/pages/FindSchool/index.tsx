@@ -14,6 +14,7 @@ const {Content} = Layout;
 
 
   interface University {
+    id: string;
     ten_truong: string;
     diem: number;
     location: string;
@@ -47,10 +48,10 @@ const FindSchool : React.FC = () => {
     
 
     
-    const normalizeVietnamese = (str) =>
+    const normalizeVietnamese = (str: string) =>
       str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value.toLowerCase();
     setSearchText(value);
     const filtered = Array.from(results).filter((record) =>
@@ -315,7 +316,7 @@ const FindSchool : React.FC = () => {
                           dataSource={Array.from(filteredData)}
                           columns={columns}
                           rowKey={(record) => `${record.id}`}
-                          pagination={true}
+                          pagination={{}}
                           scroll={{ x: 'max-content' }}
                           bordered
                           style={{ 
