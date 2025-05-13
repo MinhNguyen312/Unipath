@@ -9,15 +9,20 @@ type Props = {
   options: string[]
   disabled?: boolean
   selectedValues: string[]
+  isRequired?: boolean
 }
 
-export function SchoolSelector({ value, onChange, options, disabled, selectedValues }: Props) {
+export function SchoolSelector({ value, onChange, options, disabled, selectedValues, isRequired }: Props) {
   // Filter options: remove already selected schools (except the current one)
   const filteredOptions = [
-    {
-      value: "",
-      label: <span style={{ fontStyle: "italic", color: "#999" }}>-- Bỏ chọn --</span>,
-    },
+    ...(isRequired
+      ? []
+      : [
+          {
+            value: "",
+            label: <span style={{ fontStyle: "italic", color: "#999" }}>-- Bỏ chọn --</span>,
+          },
+        ]),
     ...options
       .filter((option) => !selectedValues.includes(option) || option === value)
       .map((option) => ({

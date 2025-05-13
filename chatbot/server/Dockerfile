@@ -12,7 +12,7 @@ RUN apk add --no-cache \
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
-    pip install --prefix=/install -r requirements.txt
+    pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 FROM python:3.10-alpine
 
@@ -30,4 +30,4 @@ ENV PYTHONPATH=/usr/local/lib/python3.10/site-packages
 
 EXPOSE 8000
 
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python3", "server.py"]

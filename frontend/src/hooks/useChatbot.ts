@@ -1,14 +1,32 @@
 export function useChatbot(
   onMessage: (chunk: string) => void,
+  onFunctionCall: (name: string, args: any) => void,
+  onFunctionResponse: (name: string, response: any) => void,
   onDone: () => void,
-  onError: () => void
+  onError: () => void,
+  onRateLimitError?: () => void
 ) {
-  return async (messages: { content: string; isUser: boolean }[]) => {
+  return async (messages: { content: string | null; isUser: boolean; functionCall: JSON | null; functionResponse: JSON | null }[]) => {
+    let shouldStop;
     try {
-      const formattedMessages = messages.map((msg) => ({
-        role: msg.isUser ? "user" : "model",
-        parts: [{ text: msg.content }],
-      }));
+      const formattedMessages = messages.map((msg) => {
+        let role = msg.isUser ? "user" : "model";
+        let parts: { text?: string; functionCall?: JSON; functionResponse?: JSON }[] = [];
+        
+        if (msg.content && msg.content.trim() !== "") {
+          parts = [{ text: msg.content }];
+        } else if (msg.functionCall) {
+          parts = [{ functionCall: msg.functionCall }];
+        } else if (msg.functionResponse) {
+          role = "user";
+          parts = [{ functionResponse: msg.functionResponse }];
+        }
+  
+        return {
+          role,
+          parts,
+        };
+      });
 
       const res = await fetch(`${import.meta.env.VITE_CHATBOT_URL}/stream`, {
         method: "POST",
@@ -16,17 +34,14 @@ export function useChatbot(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          system_instruction: {
-            role: "system",
-            parts: [
-              {
-                text: "Bạn là Unibot được thiết kế bởi Group 17 trong cuộc thi Grab Bootcamp Việt Nam. Bạn là chuyên gia tư vấn tuyển sinh đại học cũng như kỳ thi THPT quốc gia.",
-              },
-            ],
-          },
           contents: formattedMessages,
         }),
       });
+
+      if (res.status === 429) {
+        if (onRateLimitError) onRateLimitError();
+        return;
+      }
 
       if (!res.body) throw new Error("No response body");
 
@@ -51,6 +66,18 @@ export function useChatbot(
 
               try {
                 const json = JSON.parse(data);
+                if (json.functionCall) {
+                  onFunctionCall(json.functionCall.name, json.functionCall.args);
+                  shouldStop = true
+                  continue;
+                }
+                if (json.functionResponse) {
+                  onFunctionResponse(
+                    json.functionResponse.name, 
+                    json.functionResponse.response
+                  );
+                  continue;
+                }
                 const part = json.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (part) onMessage(part);
               } catch (e) {
@@ -65,7 +92,11 @@ export function useChatbot(
       onDone();
     } catch (error) {
       console.error("Streaming error:", error);
-      onError();
+      if (shouldStop) {
+        onDone();
+      } else {
+        onError();
+      }
     }
   };
 }

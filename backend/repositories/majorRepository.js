@@ -11,7 +11,7 @@ const getDistinctUniversitiesByMajor = (major) =>
 
 const getMajorInfo = (major, university) =>
   pool.query(
-    "SELECT dia_diem, to_hop_mon, hoc_phi FROM majors WHERE ten_nganh = ? AND ten_truong = ? LIMIT 1",
+    "SELECT dia_diem, to_hop_mon, hoc_phi FROM majors WHERE ten_nganh = ? AND ten_truong = ? AND nam = 2024 LIMIT 1",
     [major, university]
   );
 

@@ -1,24 +1,25 @@
 version: '3.8'
 
 services:
-  # app:
-  #   container_name: backend-unipath
-  #   build: .
-  #   ports:
-  #     - "8080:3000"
-  #   environment:
-  #     - SERVER_PORT=8080
-  #     - DB_HOST=mysql
-  #     - DB_USER=root
-  #     - DB_PASSWORD=password
-  #     - DB_NAME=unipath
-  #   depends_on:
-  #     mysql:
-  #       condition: service_healthy
+  app:
+    container_name: backend-unipath
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - DB_NAME=unipath
+      - REDIS_URL=redis://redis-unipath:6379
+    depends_on:
+      mysql:
+        condition: service_healthy
 
-    # volumes:
-    #   - /app/node_modules
-    #   - ./csv-file:/app/csv-file
+    volumes:
+      - /app/node_modules
+      - ./csv-file:/app/csv-file
 
   mysql:
     image: mysql:8.0
@@ -38,7 +39,15 @@ services:
       timeout: 5s
       retries: 10
 
-
+  redis-be:
+    image: redis:7
+    container_name: redis-unipath
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
 
 volumes:
   mysql_data:
+  redis_data:

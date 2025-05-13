@@ -1,0 +1,10 @@
+groups:
+- name: llm_alerts
+  rules:
+  - alert: HighLLMDenialRate
+    expr: llm_denials_total / llm_responses_total > 0.5
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High denial rate detected ({{ $value }})"

@@ -3,6 +3,7 @@ import { Layout, Affix, Menu, Typography} from 'antd';
 import { HomeOutlined, BarChartOutlined, SearchOutlined } from '@ant-design/icons';
 import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+
 import './styles.css';
 
 const { Header } = Layout;

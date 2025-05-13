@@ -122,7 +122,6 @@ dist
 # FuseBox cache
 .fusebox/
 
-*.csv
 
 # DynamoDB Local files
 .dynamodb/
