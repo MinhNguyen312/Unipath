@@ -55,6 +55,51 @@ async function initDatabase() {
     `;
     await pool.query(sqlPredicts);
     console.log("Table 'predicts' is ready.");
+
+   // Check if index exists and create it if not
+  const checkMajorsIndexQuery = `
+    SELECT COUNT(1) AS IndexIsThere 
+    FROM INFORMATION_SCHEMA.STATISTICS 
+    WHERE table_schema = DATABASE() 
+      AND table_name = 'majors' 
+      AND index_name = 'idx_majors_lookup'
+  `;
+
+  const checkPredictsIndexQuery = `
+    SELECT COUNT(1) AS IndexIsThere 
+    FROM INFORMATION_SCHEMA.STATISTICS 
+    WHERE table_schema = DATABASE() 
+      AND table_name = 'predicts' 
+      AND index_name = 'idx_predicts_lookup'
+  `;
+
+  // Check for index in majors table
+  const [majorsIndexResult] = await pool.query(checkMajorsIndexQuery);
+  if (majorsIndexResult[0].IndexIsThere === 0) {
+    // Index does not exist, create it
+    await pool.query(`
+      CREATE INDEX idx_majors_lookup 
+      ON majors (nam(4), diem, ma_truong, ma_nganh, to_hop_mon)
+    `);
+    console.log("Index 'idx_majors_lookup' created.");
+  } else {
+    console.log("Index 'idx_majors_lookup' already exists.");
+  }
+
+  // Check for index in predicts table
+  const [predictsIndexResult] = await pool.query(checkPredictsIndexQuery);
+  if (predictsIndexResult[0].IndexIsThere === 0) {
+    // Index does not exist, create it
+    await pool.query(`
+      CREATE INDEX idx_predicts_lookup 
+      ON predicts (nam(4), ma_truong, ma_nganh, to_hop_mon)
+    `);
+    console.log("Index 'idx_predicts_lookup' created.");
+  } else {
+    console.log("Index 'idx_predicts_lookup' already exists.");
+  }
+
+
 }
 
 // Helper to extract year from filename (e.g., vnexpress_2020.csv → 2020)
@@ -127,6 +172,8 @@ async function importAllScoreCSVs() {
     const files = fs
         .readdirSync(csvDir)
         .filter((file) => file.endsWith(".csv"));
+    console.log(fs.readdirSync(csvDir).filter((file) => file.endsWith(".csv")));
+
 
     for (const file of files) {
         const fullPath = path.join(csvDir, file);

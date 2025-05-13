@@ -9,5 +9,5 @@ router.get("/majors", controller.getMajors);
 router.get("/universities", controller.getUniversities);
 router.get("/major-info", controller.getMajorInfo);
 router.get("/score-chart", controller.getScoreChart);
-
+router.post("/matches", controller.getMatches);
 module.exports = router;

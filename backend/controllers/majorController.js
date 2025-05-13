@@ -47,9 +47,22 @@ const getScoreChart = async (req, res) => {
   }
 };
 
+const getMatches = async (req,res) => {
+  try {
+    const userScores = req.body.scores;
+    const matched = await service.getMatchingMajors(userScores);
+    res.json(matched);
+    console.log(matched);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal server error" });
+    } 
+}
+
 module.exports = {
   getMajors,
   getUniversities,
   getMajorInfo,
   getScoreChart,
+  getMatches,
 };

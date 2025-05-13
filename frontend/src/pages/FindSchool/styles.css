@@ -1,0 +1,4 @@
+.selected-row {
+    background-color: #20b433 !important; /* Light blue */
+    transition: background-color 0.3s;
+  }

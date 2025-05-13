@@ -21,9 +21,37 @@ const getScoreChart = (major, university) =>
     [major, university]
   );
 
+async function getMajorsByComboAndScore(comboCode, userScore) {
+  const [rows] = await pool.query(
+    `
+    SELECT 
+  m.*, 
+  ? AS user_score,
+  p.diem AS predicted_diem,
+  p.nam AS predicted_year,
+  (p.diem - m.diem) AS score_diff
+FROM majors m
+LEFT JOIN predicts p 
+  ON m.ma_truong = p.ma_truong 
+  AND m.ma_nganh = p.ma_nganh 
+  AND m.to_hop_mon = p.to_hop_mon 
+  AND p.nam = 2025
+WHERE 
+  CONCAT(',', m.to_hop_mon, ',') LIKE CONCAT('%,', ?, ',%')
+  AND m.diem <= ?
+  AND ? >= m.diem - 2
+  AND m.nam = 2024;
+
+    `, 
+    [userScore, comboCode, userScore, userScore]
+  );
+  return rows;
+}
+
 module.exports = {
   getDistinctMajors,
   getDistinctUniversitiesByMajor,
   getMajorInfo,
   getScoreChart,
+  getMajorsByComboAndScore
 };

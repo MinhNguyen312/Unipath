@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
           }}
         >
           <div className="logo" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="public/Unipath-logo.svg" alt="Logo" style={{ width: 40, height: 40, marginRight: 10 }} />
+            <img src="/Unipath-logo.svg" alt="Logo" style={{ width: 40, height: 40, marginRight: 10 }} />
             <Typography.Title
               level={isMobile ? 5 : 4}
               style={{
