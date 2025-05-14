@@ -8,7 +8,7 @@ import { useUniversitiesByMajor } from "../../hooks/useUniversitiesByMajors"
 import { useMajorInfo } from "../../hooks/useMajorInfo"
 import { useScoreChart } from "../../hooks/useScoreChart"
 import ScoreChart from "./ScoreChart"
-import { majorCompareCache } from "../../hooks/useCompareStore"
+import { majorCompareStore } from "../../hooks/useCompareStore"
 
 const { Title } = Typography
 
@@ -34,9 +34,9 @@ export default function SchoolComparison() {
 
   const handleSubmit = () => {
     const validSchools = schools.filter((school) => school !== "")
-    Object.keys(majorCompareCache).forEach((cachedSchool) => {
+    Object.keys(majorCompareStore.getAll()).forEach((cachedSchool) => {
       if (!validSchools.includes(cachedSchool)) {
-        delete majorCompareCache[cachedSchool];
+        majorCompareStore.clear();
       }
     });
     setSubmittedSchools(validSchools)
@@ -82,14 +82,14 @@ export default function SchoolComparison() {
       const loading = loadings[index];
   
       if (!loading && data && score) {
-        majorCompareCache[school] = {
+        majorCompareStore.set(school, {
           university: school,
           major: selectedMajor,
           city: data.dia_diem || "-",
           fee: data.hoc_phi || "-",
           examBlocks: [data.to_hop_mon || "-"],
           scores: score.map((s: { nam: number; diem: number }) => ({ year: s.nam, score: s.diem })),
-        };
+        });
       }
     });
   }, [
