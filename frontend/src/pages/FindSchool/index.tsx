@@ -323,6 +323,7 @@ const FindSchool : React.FC = () => {
                            
                         />
                       </div>
+                      <div style={{color: "#ff4f51"}}> Dự đoán chỉ mang tính chất tham khảo</div>
                     </>
                   ) : selectedCombo ? (
                     <p>Không tìm thấy trường phù hợp</p>
