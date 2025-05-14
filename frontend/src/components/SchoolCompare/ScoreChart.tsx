@@ -19,10 +19,27 @@ interface ScoreChartProps {
   data: { nam: string; diem: number }[];
 }
 
-export default function ScoreChart({ data }: ScoreChartProps) {
-  if (!data || data.length === 0) {
-    return <div style={{ fontSize: "14px", color: "#999" }}>Không có dữ liệu</div>;
+function getGradientColor(value: number, min: number, max: number) {
+  if (min === max) {
+    return "rgb(139, 195, 74)";
   }
+
+  const percent = (value - min) / (max - min);
+  // Xanh lá: nhạt → đậm
+  const start = [255, 241, 118]; // vàng nhạt
+  const end = [56, 142, 60];     // xanh đậm
+
+  const r = Math.round(start[0] + percent * (end[0] - start[0]));
+  const g = Math.round(start[1] + percent * (end[1] - start[1]));
+  const b = Math.round(start[2] + percent * (end[2] - start[2]));
+
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+export default function ScoreChart({ data }: ScoreChartProps) {
+  const values = data.map((d) => d.diem);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
 
   const chartData: ChartData<"bar"> = {
     labels: data.map((d) => d.nam),
@@ -30,7 +47,7 @@ export default function ScoreChart({ data }: ScoreChartProps) {
       {
         label: "Điểm",
         data: data.map((d) => d.diem),
-        backgroundColor: "#4CAF50",
+        backgroundColor: values.map((v) => getGradientColor(v, min, max)),
         borderRadius: 6,
         barThickness: 24,
       },
@@ -49,10 +66,11 @@ export default function ScoreChart({ data }: ScoreChartProps) {
       datalabels: {
         display: true,
         anchor: "end",
-        align: "start",
+        align: "end",
         color: "#333",
         font: {
           size: 10,
+          weight: "bold",
         },
       },
     },

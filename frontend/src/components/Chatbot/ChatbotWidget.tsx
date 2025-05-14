@@ -4,7 +4,7 @@ import { MessageOutlined, CloseOutlined, ReloadOutlined, DownOutlined, SearchOut
 import { useChatbot } from "../../hooks/useChatbot";
 import ReactMarkdown from "react-markdown";
 import { SendOutlined } from "@ant-design/icons";
-import { majorCompareCache } from "../../hooks/useCompareStore";
+import { majorCompareStore } from "../../hooks/useCompareStore";
 import remarkGfm from 'remark-gfm';
 const { TextArea } = Input;
 import { Switch } from 'antd'
@@ -135,13 +135,13 @@ const ErrorPopup = ({ message, onClose }: { message: string; onClose: () => void
 };
 
 const formatMajorCompareCache = (): string => {
-  if (Object.keys(majorCompareCache).length === 0) {
+  if (Object.keys(majorCompareStore).length === 0) {
     return "Không có thông tin về các ngành đang so sánh.";
   }
 
   let result = "Thông tin về các ngành đang so sánh:\n";
-  for (const key in majorCompareCache) {
-    const info = majorCompareCache[key];
+  for (const key in majorCompareStore) {
+    const info = majorCompareStore[key];
     result += `- Trường: ${info.university}, Ngành: ${info.major}, Thành phố: ${info.city}, Học phí: ${info.fee}, Khối thi: ${info.examBlocks.join(", ")}, Điểm chuẩn: ${info.scores
       .map((s) => `${s.year}: ${s.score}`)
       .join(", ")}\n`;

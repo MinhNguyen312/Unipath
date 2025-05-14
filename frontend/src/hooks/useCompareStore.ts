@@ -7,4 +7,4 @@ export type MajorInfo = {
   scores: { year: number; score: number }[];
 };
 
-export const majorCompareCache: Record<string, MajorInfo> = {};
+export const majorCompareStore: Record<string, MajorInfo> = {};

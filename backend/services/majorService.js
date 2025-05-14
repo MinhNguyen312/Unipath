@@ -54,7 +54,10 @@ const getScoreData = async (major, university) => {
   }
 
   const [rows] = await repository.getScoreChart(major, university);
-  return rows.map(({ nam, diem }) => ({ nam, diem }));
+  const mapped = rows.map(({ nam, diem }) => ({ nam, diem }));
+
+  await redisClient.set(cacheKey, JSON.stringify(mapped), { EX: 3600 });
+  return mapped;
 };
 
 const getMatchingMajors = async (userScores) => {

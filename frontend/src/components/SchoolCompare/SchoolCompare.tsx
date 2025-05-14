@@ -8,7 +8,7 @@ import { useUniversitiesByMajor } from "../../hooks/useUniversitiesByMajors"
 import { useMajorInfo } from "../../hooks/useMajorInfo"
 import { useScoreChart } from "../../hooks/useScoreChart"
 import ScoreChart from "./ScoreChart"
-import { majorCompareCache } from "../../hooks/useCompareStore"
+import { majorCompareStore } from "../../hooks/useCompareStore"
 
 const { Title } = Typography
 
@@ -34,9 +34,9 @@ export default function SchoolComparison() {
 
   const handleSubmit = () => {
     const validSchools = schools.filter((school) => school !== "")
-    Object.keys(majorCompareCache).forEach((cachedSchool) => {
+    Object.keys(majorCompareStore).forEach((cachedSchool) => {
       if (!validSchools.includes(cachedSchool)) {
-        delete majorCompareCache[cachedSchool];
+        delete majorCompareStore[cachedSchool];
       }
     });
     setSubmittedSchools(validSchools)
@@ -82,7 +82,7 @@ export default function SchoolComparison() {
       const loading = loadings[index];
   
       if (!loading && data && score) {
-        majorCompareCache[school] = {
+        majorCompareStore[school] = {
           university: school,
           major: selectedMajor,
           city: data.dia_diem || "-",

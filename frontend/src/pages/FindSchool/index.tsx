@@ -10,8 +10,6 @@ import './styles.css';
 const {Title} = Typography;
 const {Content} = Layout;
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
 
   interface University {
     id: string;
@@ -84,7 +82,7 @@ const FindSchool : React.FC = () => {
         })
 
         try {
-          const res = await axios.post(`${API_BASE_URL}/api/matches`,{
+          const res = await axios.post(`/api/matches`,{
             scores
           })
 
@@ -122,7 +120,7 @@ const FindSchool : React.FC = () => {
         
 
         try {
-          const res = await axios.post(`${API_BASE_URL}/api/matches`, {
+          const res = await axios.post(`/api/matches`, {
             scores
           },
           
@@ -194,7 +192,7 @@ const FindSchool : React.FC = () => {
       
             <Row gutter={[24, 24]} justify="center">
               {/* Left Column: Form (Smaller width) */}
-              <Col xs={24} lg={5}>
+              <Col xs={24} lg={7}>
                 <Card>
                   <Form
                     layout="horizontal"  // Compact form layout
@@ -231,7 +229,7 @@ const FindSchool : React.FC = () => {
                     </Form.Item>
 
                     <Form.Item
-                        labelCol={{ span: 6 }}  
+                        labelCol={{ span: 10}}  
                         wrapperCol={{ span: '100%' }}
                         labelAlign="left"  
                         label={findMode === "combination" ? "Tổ hợp" : "Khối thi"}
@@ -265,7 +263,7 @@ const FindSchool : React.FC = () => {
                         key={subject}
                         label={`${subject}`}
                         name={subject}
-                        labelCol={{ span: 6 }}  
+                        labelCol={{ span: 10 }}  
                         wrapperCol={{ span: '100%' }}
                         labelAlign="left"  
                         rules={[{ required: true, message: `Hãy điền điểm thi ${subject}` }]}
@@ -291,7 +289,7 @@ const FindSchool : React.FC = () => {
               </Col>
       
               {/* Right Column: Results (Larger width) */}
-              <Col xs={24} lg={19}>
+              <Col xs={24} lg={16}>
                 
               <Card>
                   <Title level={4} style={{color:'#1e894e'}}>Tìm kiếm ngành học</Title>
